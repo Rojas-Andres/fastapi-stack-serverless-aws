@@ -251,7 +251,7 @@ test.db
 test_setup.db
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
-
+DynamoDb-GUI-Client/
 # Windows Installer files
 *.cab
 *.msi

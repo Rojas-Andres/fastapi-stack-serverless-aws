@@ -55,6 +55,17 @@ Globals:
         ENVIRONMENT: !Ref Environment
 
 Resources:
+
+  LayerShared:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      Description: Layer for Data Ingestor
+      ContentUri: ../shared
+      CompatibleRuntimes:
+        - python3.12
+    Metadata:
+      BuildMethod: makefile
+
   Api:
     Type: AWS::Serverless::Api
     Name: !Sub api-${StackName}-${Environment}
@@ -148,6 +159,8 @@ Resources:
       Policies:
         - AmazonDynamoDBFullAccess
         - VPCAccessPolicy : {}
+      Layers:
+        - !Ref LayerShared
       Events:
         validateAuth:
           Type: Api

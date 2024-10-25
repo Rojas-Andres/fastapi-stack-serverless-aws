@@ -10,5 +10,14 @@ build-sam:
 local-sam: ## up d
 	sam local start-api --parameter-overrides Environment="local" GlobalTimeout="300"
 
+up:
+	docker-compose up -d
+
+down:
+	docker-compose down
+
+logs:
+	docker-compose logs -f
+
 dev-check: ##Run all pre-commit hooks.
 	@pre-commit run --all-files

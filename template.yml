@@ -41,14 +41,6 @@ Parameters:
     Description: Stack Name inmensity
     Type: AWS::SSM::Parameter::Value<String>
     Default: StackName
-  EnvBucketName:
-    Description: Env aws access key
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: EnvBucketName
-  RegionBucket:
-    Description: Env aws region
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: RegionBucket
   SendGridApiKey:
     Description: Send Grid Api Key
     Type: AWS::SSM::Parameter::Value<String>
@@ -99,8 +91,6 @@ Resources:
         TokenExpiration: !Ref TokenExpiration
         AuthorizerTimeout: !Ref AuthorizerTimeout
         SQSBatchSize: !Ref SQSBatchSize
-        EnvBucketName: !Ref EnvBucketName
-        RegionBucket: !Ref RegionBucket
         SendGridApiKey: !Ref SendGridApiKey
         FromEmail: !Ref FromEmail
         StackName: !Ref StackName

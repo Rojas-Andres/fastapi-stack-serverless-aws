@@ -60,7 +60,6 @@ Globals:
         SENDGRID_API_KEY: !Ref SendGridApiKey
         DYNAMO_DB_TABLE: !Ref DynamoDBTable
 Resources:
-
   LayerShared:
     Type: AWS::Serverless::LayerVersion
     Properties:

@@ -13,6 +13,8 @@ services:
       - ./dynamodb_data:/data
     expose:
       - 8000
+    networks:
+      dynamodb-local-network: {}
   dynamodb-admin:
     image: aaronshaf/dynamodb-admin
     ports:
@@ -24,3 +26,6 @@ services:
       AWS_SECRET_ACCESS_KEY: local
     depends_on:
       - dynamodb
+networks:
+  dynamodb-local-network:
+    name: dynamodb-local-network

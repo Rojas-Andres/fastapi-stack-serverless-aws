@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  AI Agent SAM Template
+  SAM Template FastAPI
 
 
 Parameters:
@@ -53,10 +53,6 @@ Parameters:
     Description: Send Grid Api Key
     Type: AWS::SSM::Parameter::Value<String>
     Default: SendGridApiKey
-  FromEmail:
-    Description: From Email
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: FromEmail
 Resources:
 
   # Dynamo Stack
@@ -84,8 +80,6 @@ Resources:
         Environment: !Ref Environment
         SecretKey: !Ref SecretKey
         StackName: !Ref StackName
-        # Layer
-        LayerDependencies: !GetAtt LayerStack.Outputs.LayerDependencies
         # Dynamo
         DynamoTableName: !GetAtt DynamoStack.Outputs.DynamoTableName
       Tags:
@@ -100,14 +94,7 @@ Resources:
       Parameters:
         Environment: !Ref Environment
         SecretKey: !Ref SecretKey
-        DBName: !Ref DBName
-        DBUser: !Ref DBUser
-        DBPassword: !Ref DBPassword
-        DBPort: !Ref DBPort
-        DBHostRead: !Ref DBHostRead
-        DBHostWriter: !Ref DBHostWriter
         Environment: !Ref Environment
-        EnvAwsRegion: !Ref EnvAwsRegion
         GlobalTimeout: !Ref GlobalTimeout
         TokenExpiration: !Ref TokenExpiration
         AuthorizerTimeout: !Ref AuthorizerTimeout
@@ -117,8 +104,6 @@ Resources:
         SendGridApiKey: !Ref SendGridApiKey
         FromEmail: !Ref FromEmail
         StackName: !Ref StackName
-        # Layer
-        LayerDependencies: !GetAtt LayerStack.Outputs.LayerDependencies
         # Dynamo
         DynamoTableName: !GetAtt DynamoStack.Outputs.DynamoTableName
         AuthorizerArn: !GetAtt AuthorizerStack.Outputs.AuthorizerArn

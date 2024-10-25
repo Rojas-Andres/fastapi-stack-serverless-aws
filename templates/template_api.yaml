@@ -11,34 +11,6 @@ Parameters:
     Description: secret key
     Type: String
     Default: secret_key
-  DBName:
-    Description: database name
-    Type: String
-    Default: stack-database-name
-  DBPort:
-    Description: database port
-    Type: String
-    Default: stack-database-port
-  DBUser:
-    Description: database user
-    Type: String
-    Default: stack-database-user
-  DBPassword:
-    Description: database password
-    Type: String
-    Default: stack-database-password
-  DBHostRead:
-    Description: database host read
-    Type: String
-    Default: stack-database-host-read
-  DBHostWriter:
-    Description: database host writer
-    Type: String
-    Default: stack-database-host-writer
-  EnvAwsRegion:
-    Description: Env aws region
-    Type: String
-    Default: env_aws_region
   GlobalTimeout:
     Description: Global timeout
     Type: Number
@@ -51,9 +23,6 @@ Parameters:
     Description: Authorizer timeout
     Type: Number
     Default: 30
-  LayerDependencies:
-    Description: Layer dependencies
-    Type: String
   DynamoTableName:
     Description: Dynamo table name
     Type: String
@@ -68,22 +37,10 @@ Parameters:
     Description: stack Name
     Type: String
     Default: stack-stack-name
-  EnvBucketName:
-    Description: Env aws access key
-    Type: String
-    Default: bucket_name
-  RegionBucket:
-    Description: Env aws region
-    Type: String
-    Default: us-east-1
   SendGridApiKey:
     Description: Send Grid Api Key
     Type: String
     Default: SendGridApiKey
-  FromEmail:
-    Description: From Email
-    Type: String
-    Default: FromEmail
 Globals:
   Function:
     Timeout: !Ref GlobalTimeout
@@ -181,11 +138,9 @@ Resources:
   AuthFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../modules/auth
+      CodeUri: ../src/auth
       FunctionName: !Sub auth-${StackName}-${Environment}
       Description: !Sub Auth microservice «${Environment}»
-      Layers:
-        - !Ref LayerDependencies
       Environment:
         Variables:
           FUNCTION_NAME: !Sub auth-${StackName}-${Environment}
@@ -198,8 +153,10 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref Api
-            Path: /auth
+            Path: /auth/health
             Method: GET
+            Auth:
+              Authorizer: NONE
         Singin:
           Type: Api
           Properties:
@@ -237,8 +194,6 @@ Resources:
   #     FunctionName: !Sub notifications-${StackName}-${Environment}
   #     Description: !Sub notifications «${Environment}»
   #     Timeout: !Ref AuthorizerTimeout
-  #     Layers:
-  #       - !Ref LayerDependencies
   #     Policies:
   #       - SQSPollerPolicy:
   #           QueueName: !GetAtt SqsQueue.QueueName

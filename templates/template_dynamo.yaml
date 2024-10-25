@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Stack Microservices
+
+
+Parameters:
+  StackName:
+    Description: stack Name
+    Type: String
+    Default: stack-stack-name
+  Environment:
+    Description: Environment in which the resources will be deploy
+    Type: String
+    Default: development
+  DyanmoDBReadCapacityUnits:
+    Description: dynamodb read capacity units
+    Type: String
+    Default: 5
+  DyanmoDBWriteCapacityUnits:
+    Description: dynamodb write capacity units
+    Type: String
+    Default: 5
+
+Resources:
+
+  AuthorizersDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub DbAuthoTable${Environment}
+      AttributeDefinitions:
+        - AttributeName: uuid
+          AttributeType: S
+      KeySchema:
+        - AttributeName: uuid
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: expires_at
+        Enabled: true
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref DyanmoDBReadCapacityUnits
+        WriteCapacityUnits: !Ref DyanmoDBWriteCapacityUnits
+
+Outputs:
+  DynamoTableName:
+    Value: !Sub DbAuthoTable${Environment}
+    Export:
+      Name: !Sub DbAuthoTable${Environment}

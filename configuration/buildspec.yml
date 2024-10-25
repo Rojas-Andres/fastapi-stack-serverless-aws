@@ -1,0 +1,24 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+        python: 3.9
+  build:
+    commands:
+      - pip install --user aws-sam-cli
+      - USER_BASE_PATH=$(python -m site --user-base)
+      - export PATH=$PATH:$USER_BASE_PATH/bin
+      # Add layers to lambdas
+      - python -m pip install --upgrade pip
+      - pip install -r layer_dependencies_basic/requirements.txt -t layer_dependencies_basic/python
+      - cd layer_dependencies_basic
+      - zip -r layer_dependencies_basic.zip python
+      - cd ..
+      # Add requirements to lambdas
+      - python generate_requirements.py $SECRET_TOKEN_GITHUB $BRANCH_DEPLOY
+      - sam build -t template_master.yaml
+      - aws cloudformation package --template-file .aws-sam/build/template.yaml --s3-bucket $BUCKET_NAME --output-template-file packaged-template.yml
+      - aws s3 cp ./packaged-template.yml s3://$BUCKET_NAME/packaged-template.yml
+artifacts:
+  files:
+    - packaged-template.yml

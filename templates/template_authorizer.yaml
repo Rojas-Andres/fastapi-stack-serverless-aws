@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Stack Microservices
+
+Parameters:
+  Environment:
+    Description: Environment in which the resources will be deploy
+    Type: String
+    Default: development
+  LayerDependencies:
+    Description: Layer Dependencies
+    Type: String
+  DynamoTableName:
+    Description: Dynamo Table name
+    Type: String
+  SecretKey:
+    Description: Secret Key
+    Type: String
+  GlobalTimeout:
+    Description: Global timeout
+    Type: String
+  StackName:
+    Description: stack Name
+    Type: String
+    Default: stack-stack-name
+
+Globals:
+  Function:
+    Timeout: !Ref GlobalTimeout
+    Tracing: Active
+    MemorySize: 256
+    Handler: app.handler
+    Runtime: python3.12
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        ENVIRONMENT: !Ref Environment
+        SECRET_KEY: !Ref SecretKey
+
+Resources:
+  AuthorizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../modules/authorizer
+      FunctionName: !Sub authorizer-${StackName}-${Environment}
+      Description: !Sub Authorizer microservice «${Environment}»
+      Layers:
+        - !Ref LayerDependencies
+      VpcConfig: ~
+      Environment:
+        Variables:
+          FUNCTION_NAME: !Sub auth-${StackName}-${Environment}
+          AUTHORIZER_TABLE: !Ref DynamoTableName
+      Policies:
+        - AmazonDynamoDBFullAccess
+
+Outputs:
+  AuthorizerArn:
+    Value: !GetAtt AuthorizerFunction.Arn
+    Export:
+      Name: !Sub "${StackName}-AuthoArn"
+  AuthorizerFunction:
+    Value: !Ref AuthorizerFunction
+    Export:
+      Name: !Sub "${StackName}-AuthoFun"

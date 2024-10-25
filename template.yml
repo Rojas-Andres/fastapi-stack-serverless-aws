@@ -1,0 +1,128 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  AI Agent SAM Template
+
+
+Parameters:
+  Environment:
+    Description: Environment in which the resources will be deploy
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: Environment
+  SQSBatchSize:
+    Description: sqs batch size
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: SQSBatchSize
+  AuthorizerTimeout:
+    Description: authorizer timeout
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: AuthorizerTimeout
+  TokenExpiration:
+    Description: token expiration
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: TokenExpiration
+  GlobalTimeout:
+    Description: global timeout
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: GlobalTimeout
+  DyanmoDBReadCapacityUnits:
+    Description: dynamodb read capacity units
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: DyanmoDBReadCapacityUnits
+  DyanmoDBWriteCapacityUnits:
+    Description: dynamodb write capacity units
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: DyanmoDBWriteCapacityUnits
+  SecretKey:
+    Description: Secret Key
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: SecretKey
+  StackName:
+    Description: Stack Name inmensity
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: StackName
+  EnvBucketName:
+    Description: Env aws access key
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: EnvBucketName
+  RegionBucket:
+    Description: Env aws region
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: RegionBucket
+  SendGridApiKey:
+    Description: Send Grid Api Key
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: SendGridApiKey
+  FromEmail:
+    Description: From Email
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: FromEmail
+Resources:
+
+  # Dynamo Stack
+  DynamoStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: templates/template_dynamo.yaml
+      Parameters:
+        StackName: !Ref StackName
+        Environment: !Ref Environment
+        DyanmoDBReadCapacityUnits: !Ref DyanmoDBReadCapacityUnits
+        DyanmoDBWriteCapacityUnits: !Ref DyanmoDBWriteCapacityUnits
+      Tags:
+        Environment: !Ref Environment
+        StackName: !Ref StackName
+      TimeoutInMinutes: 10
+
+  # Authorizer Stack
+  AuthorizerStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: templates/template_authorizer.yaml
+      Parameters:
+        GlobalTimeout: !Ref GlobalTimeout
+        Environment: !Ref Environment
+        SecretKey: !Ref SecretKey
+        StackName: !Ref StackName
+        # Layer
+        LayerDependencies: !GetAtt LayerStack.Outputs.LayerDependencies
+        # Dynamo
+        DynamoTableName: !GetAtt DynamoStack.Outputs.DynamoTableName
+      Tags:
+        Environment: !Ref Environment
+        StackName: !Ref StackName
+      TimeoutInMinutes: 10
+
+  ApiGatewayStack:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: templates/template_api.yaml
+      Parameters:
+        Environment: !Ref Environment
+        SecretKey: !Ref SecretKey
+        DBName: !Ref DBName
+        DBUser: !Ref DBUser
+        DBPassword: !Ref DBPassword
+        DBPort: !Ref DBPort
+        DBHostRead: !Ref DBHostRead
+        DBHostWriter: !Ref DBHostWriter
+        Environment: !Ref Environment
+        EnvAwsRegion: !Ref EnvAwsRegion
+        GlobalTimeout: !Ref GlobalTimeout
+        TokenExpiration: !Ref TokenExpiration
+        AuthorizerTimeout: !Ref AuthorizerTimeout
+        SQSBatchSize: !Ref SQSBatchSize
+        EnvBucketName: !Ref EnvBucketName
+        RegionBucket: !Ref RegionBucket
+        SendGridApiKey: !Ref SendGridApiKey
+        FromEmail: !Ref FromEmail
+        StackName: !Ref StackName
+        # Layer
+        LayerDependencies: !GetAtt LayerStack.Outputs.LayerDependencies
+        # Dynamo
+        DynamoTableName: !GetAtt DynamoStack.Outputs.DynamoTableName
+        AuthorizerArn: !GetAtt AuthorizerStack.Outputs.AuthorizerArn
+      Tags:
+        Environment: !Ref Environment
+        StackName: !Ref StackName
+      TimeoutInMinutes: 10

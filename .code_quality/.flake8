@@ -1,0 +1,9 @@
+[flake8]
+exclude =
+    versions,
+    generate_setup_db.py,
+    main.py,
+    generate_requirements.py,
+    shared_package/migrations/versions/*.py
+
+max-line-length = 120

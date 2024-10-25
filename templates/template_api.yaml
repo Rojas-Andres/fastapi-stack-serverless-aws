@@ -1,0 +1,268 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Stack Microservices
+
+Parameters:
+  Environment:
+    Description: Environment in which the resources will be deploy
+    Type: String
+    Default: development
+  SecretKey:
+    Description: secret key
+    Type: String
+    Default: secret_key
+  DBName:
+    Description: database name
+    Type: String
+    Default: stack-database-name
+  DBPort:
+    Description: database port
+    Type: String
+    Default: stack-database-port
+  DBUser:
+    Description: database user
+    Type: String
+    Default: stack-database-user
+  DBPassword:
+    Description: database password
+    Type: String
+    Default: stack-database-password
+  DBHostRead:
+    Description: database host read
+    Type: String
+    Default: stack-database-host-read
+  DBHostWriter:
+    Description: database host writer
+    Type: String
+    Default: stack-database-host-writer
+  EnvAwsRegion:
+    Description: Env aws region
+    Type: String
+    Default: env_aws_region
+  GlobalTimeout:
+    Description: Global timeout
+    Type: Number
+    Default: 30
+  TokenExpiration:
+    Description: Token expiration
+    Type: Number
+    Default: 60
+  AuthorizerTimeout:
+    Description: Authorizer timeout
+    Type: Number
+    Default: 30
+  LayerDependencies:
+    Description: Layer dependencies
+    Type: String
+  DynamoTableName:
+    Description: Dynamo table name
+    Type: String
+  AuthorizerArn:
+    Description: Authorizer Arn
+    Type: String
+  SQSBatchSize:
+    Description: sqs batch size
+    Type: String
+    Default: 5
+  StackName:
+    Description: stack Name
+    Type: String
+    Default: stack-stack-name
+  EnvBucketName:
+    Description: Env aws access key
+    Type: String
+    Default: bucket_name
+  RegionBucket:
+    Description: Env aws region
+    Type: String
+    Default: us-east-1
+  SendGridApiKey:
+    Description: Send Grid Api Key
+    Type: String
+    Default: SendGridApiKey
+  FromEmail:
+    Description: From Email
+    Type: String
+    Default: FromEmail
+Globals:
+  Function:
+    Timeout: !Ref GlobalTimeout
+    Tracing: Active
+    MemorySize: 256
+    Handler: app.handler
+    Runtime: python3.12
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        ENVIRONMENT: !Ref Environment
+
+Resources:
+  Api:
+    Type: AWS::Serverless::Api
+    Name: !Sub api-${StackName}-${Environment}
+    Properties:
+      TracingEnabled: true
+      StageName: !Ref Environment
+      Cors:
+        AllowOrigin: "'*'"
+        AllowMethods: "'*'"
+        AllowHeaders: "'*'"
+      GatewayResponses:
+        DEFAULT_4XX:
+          StatusCode: 401
+          ResponseParameters:
+            Headers:
+              Access-Control-Expose-Headers: "'*'"
+              Access-Control-Allow-Origin: "'*'"
+        UNAUTHORIZED:
+          StatusCode: 401
+          ResponseParameters:
+            Headers:
+              Access-Control-Expose-Headers: "'*'"
+              Access-Control-Allow-Origin: "'*'"
+          ResponseTemplates:
+            application/json: "{ \"error\": { \"code\": \"custom-401-unauthorized\", \"message\": $context.error.messageString }, \"requestId\": \"$context.requestId\" }"
+        ACCESS_DENIED:
+          StatusCode: 401
+          ResponseParameters:
+            Headers:
+              Access-Control-Expose-Headers: "'*'"
+              Access-Control-Allow-Origin: "'*'"
+          ResponseTemplates:
+            application/json: "{ \"error\": { \"code\": \"custom-401-access-denied\", \"message\": $context.error.messageString }, \"requestId\": \"$context.requestId\" }"
+        INVALID_API_KEY:
+          StatusCode: 401
+          ResponseTemplates:
+            application/json: "{ \"error\": { \"code\": \"custom-401-invalid-api-key\", \"message\": $context.error.messageString }, \"requestId\": \"$context.requestId\" }"
+          ResponseParameters:
+            Headers:
+              Access-Control-Expose-Headers: "'*'"
+              Access-Control-Allow-Origin: "'*'"
+        MISSING_AUTHENTICATION_TOKEN:
+          StatusCode: 401
+          ResponseParameters:
+            Headers:
+              Access-Control-Expose-Headers: "'*'"
+              Access-Control-Allow-Origin: "'*'"
+          ResponseTemplates:
+            application/json: "{ \"error\": { \"code\": \"custom-401-missing-token\", \"message\": $context.error.messageString }, \"requestId\": \"$context.requestId\" }"
+        EXPIRED_TOKEN:
+          StatusCode: 401
+          ResponseParameters:
+            Headers:
+              Access-Control-Expose-Headers: "'*'"
+              Access-Control-Allow-Origin: "'*'"
+          ResponseTemplates:
+            application/json: "{ \"error\": { \"code\": \"custom-401-expired-token\", \"message\": $context.error.messageString }, \"requestId\": \"$context.requestId\" }"
+        AUTHORIZER_CONFIGURATION_ERROR:
+          StatusCode: 401
+          ResponseParameters:
+            Headers:
+              Access-Control-Expose-Headers: "'*'"
+              Access-Control-Allow-Origin: "'*'"
+          ResponseTemplates:
+            application/json: "{ \"error\": { \"code\": \"custom-401-auth-config-error\", \"message\": $context.error.messageString }, \"requestId\": \"$context.requestId\" }"
+        AUTHORIZER_FAILURE:
+          StatusCode: 401
+          ResponseParameters:
+            Headers:
+              Access-Control-Expose-Headers: "'*'"
+              Access-Control-Allow-Origin: "'*'"
+          ResponseTemplates:
+            application/json: "{ \"error\": { \"code\": \"custom-401-authorizer-failed\", \"message\": $context.error.messageString }, \"requestId\": \"$context.requestId\" }"
+      Auth:
+        DefaultAuthorizer: LambdaAuthorizer
+        AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          LambdaAuthorizer:
+            FunctionArn: !Ref AuthorizerArn
+
+  AuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../modules/auth
+      FunctionName: !Sub auth-${StackName}-${Environment}
+      Description: !Sub Auth microservice «${Environment}»
+      Layers:
+        - !Ref LayerDependencies
+      Environment:
+        Variables:
+          FUNCTION_NAME: !Sub auth-${StackName}-${Environment}
+          TOKEN_EXPIRATION: !Ref TokenExpiration
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - VPCAccessPolicy : {}
+      Events:
+        validateAuth:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /auth
+            Method: GET
+        Singin:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /auth/signin
+            Method: POST
+            Auth:
+              Authorizer: NONE
+        Singup:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /auth/signup
+            Method: POST
+            Auth:
+              Authorizer: NONE
+        Social:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /auth/social
+            Method: POST
+            Auth:
+              Authorizer: NONE
+        SocialRegister:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /auth/social/register
+            Method: POST
+  # NotificationFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: modules/notifications
+  #     FunctionName: !Sub notifications-${StackName}-${Environment}
+  #     Description: !Sub notifications «${Environment}»
+  #     Timeout: !Ref AuthorizerTimeout
+  #     Layers:
+  #       - !Ref LayerDependencies
+  #     Policies:
+  #       - SQSPollerPolicy:
+  #           QueueName: !GetAtt SqsQueue.QueueName
+  #       - VPCAccessPolicy : {}
+  #     Events:
+  #       SQSEvent:
+  #         Type: SQS
+  #         Properties:
+  #           Queue: !GetAtt SqsQueue.Arn
+  #           BatchSize: !Ref SQSBatchSize
+
+  # SqsQueue:
+  #   Type: AWS::SQS::Queue
+  #   Properties:
+  #     QueueName: !Sub sqs-queue-${StackName}-${Environment}
+  #     VisibilityTimeout: !Ref AuthorizerTimeout
+
+
+Outputs:
+  Region:
+    Description: "Region"
+    Value: !Ref AWS::Region
+  MyApi:
+    Value: !Ref Api
+  ApiUrl:
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/${Environment}"
+    Description: URL de la API

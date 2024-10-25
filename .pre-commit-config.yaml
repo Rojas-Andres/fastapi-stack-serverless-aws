@@ -1,0 +1,40 @@
+default_language_version:
+  python: python3.12
+default_stages:
+  - commit
+  - push
+exclude: >
+  (?x)^(
+      .*/migrations/[0-9]{4}_.*\.py
+      | .*/alembic/.*\.py
+      | alembic/env.py
+      | .*test.*
+      | main.py
+      | .*/alembic/versions/.*\.py
+      | alembic/versions/.*
+  )$
+repos:
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.1
+    hooks:
+      - id: flake8
+        args:
+          - --config=.code_quality/.flake8
+          - --ignore=W503
+        exclude: (tests|\.code_quality)
+  - repo: https://github.com/pycqa/pylint
+    rev: v3.3.1
+    hooks:
+      - id: pylint
+        args:
+          - --rcfile=.code_quality/.pylintrc
+        exclude: (tests|\.code_quality|main.py|setup.py)
+        verbose: true
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.7.0
+    hooks:
+      # Run the linter.
+      - id: ruff
+      # Run the formatter.
+      - id: ruff-format

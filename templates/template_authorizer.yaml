@@ -39,7 +39,7 @@ Resources:
   AuthorizerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../modules/authorizer
+      CodeUri: ../src/authorizer
       FunctionName: !Sub authorizer-${StackName}-${Environment}
       Description: !Sub Authorizer microservice «${Environment}»
 

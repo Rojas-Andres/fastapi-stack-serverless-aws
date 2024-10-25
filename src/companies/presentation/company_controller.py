@@ -3,6 +3,7 @@ from application.services import CompanyService
 from fastapi import status as response_status
 from starlette.requests import Request
 from domain.exceptions import CompanyNotFoundException
+from presentation.schemas import CompanyCreate
 
 router = APIRouter(prefix="/companies")
 
@@ -31,8 +32,8 @@ async def api_health(
 
 
 @router.post("/")
-def api_create_company(request: Request, name: str, address: str):
-    return company_service.create_company(name, address)
+def api_create_company(request: Request, company: CompanyCreate):
+    return company_service.create_company(**company.dict())
 
 
 @router.get("/{company_id}")

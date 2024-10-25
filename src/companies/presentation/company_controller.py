@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from application.services import CompanyService
 from fastapi import status as response_status
 from starlette.requests import Request
-from companies.domain.exceptions import CompanyNotFoundException
+from domain.exceptions import CompanyNotFoundException
 
 router = APIRouter(prefix="/companies")
 

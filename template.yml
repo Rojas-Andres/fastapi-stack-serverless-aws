@@ -7,43 +7,43 @@ Description: >
 Parameters:
   Environment:
     Description: Environment in which the resources will be deploy
-    Type: AWS::SSM::Parameter::Value<String>
+    Type: String
     Default: Environment
   SQSBatchSize:
     Description: sqs batch size
-    Type: AWS::SSM::Parameter::Value<String>
+    Type: String
     Default: SQSBatchSize
   AuthorizerTimeout:
     Description: authorizer timeout
-    Type: AWS::SSM::Parameter::Value<String>
+    Type: String
     Default: AuthorizerTimeout
   TokenExpiration:
     Description: token expiration
-    Type: AWS::SSM::Parameter::Value<String>
+    Type: String
     Default: TokenExpiration
   GlobalTimeout:
     Description: global timeout
-    Type: AWS::SSM::Parameter::Value<String>
+    Type: String
     Default: GlobalTimeout
   DyanmoDBReadCapacityUnits:
     Description: dynamodb read capacity units
-    Type: AWS::SSM::Parameter::Value<String>
+    Type: String
     Default: DyanmoDBReadCapacityUnits
   DyanmoDBWriteCapacityUnits:
     Description: dynamodb write capacity units
-    Type: AWS::SSM::Parameter::Value<String>
+    Type: String
     Default: DyanmoDBWriteCapacityUnits
   SecretKey:
     Description: Secret Key
-    Type: AWS::SSM::Parameter::Value<String>
+    Type: String
     Default: SecretKey
   StackName:
     Description: Stack Name inmensity
-    Type: AWS::SSM::Parameter::Value<String>
+    Type: String
     Default: StackName
   SendGridApiKey:
     Description: Send Grid Api Key
-    Type: AWS::SSM::Parameter::Value<String>
+    Type: String
     Default: SendGridApiKey
 Resources:
 
@@ -96,6 +96,7 @@ Resources:
         StackName: !Ref StackName
         # Dynamo
         DynamoTableName: !GetAtt DynamoStack.Outputs.DynamoTableName
+        DynamoDBTable: !GetAtt DynamoStack.Outputs.DynamoDBTable
         AuthorizerArn: !GetAtt AuthorizerStack.Outputs.AuthorizerArn
       Tags:
         Environment: !Ref Environment

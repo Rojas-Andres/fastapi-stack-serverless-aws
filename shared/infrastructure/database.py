@@ -13,4 +13,4 @@ def get_dynamodb_table(table_name: str):
     return dynamodb.Table(table_name)
 
 
-table = get_dynamodb_table(constants.DYNAMO_TABLA_NAME)
+table = get_dynamodb_table(constants.DYNAMO_DB_TABLE)

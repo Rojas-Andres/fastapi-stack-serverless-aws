@@ -8,10 +8,10 @@ build-sam:
 	sam build --use-container --parameter-overrides Environment="local" GlobalTimeout="300"
 
 local-sam: ## up d
-	sam local start-api --parameter-overrides Environment="local" GlobalTimeout="300"
+	sh local_files/execute_sam.sh
 
 create-tables-dynamo: ## up d
-	python local_dynamo/create_tables.py
+	python local_files/create_tables.py
 
 up:
 	docker-compose up -d

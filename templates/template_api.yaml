@@ -41,6 +41,9 @@ Parameters:
     Description: Send Grid Api Key
     Type: String
     Default: SendGridApiKey
+  DynamoDBTable:
+    Description: DynamoDB Table
+    Type: String
 Globals:
   Function:
     Timeout: !Ref GlobalTimeout
@@ -53,7 +56,9 @@ Globals:
     Environment:
       Variables:
         ENVIRONMENT: !Ref Environment
-
+        SECRET_KEY: !Ref SecretKey
+        SENDGRID_API_KEY: !Ref SendGridApiKey
+        DYNAMO_DB_TABLE: !Ref DynamoDBTable
 Resources:
 
   LayerShared:

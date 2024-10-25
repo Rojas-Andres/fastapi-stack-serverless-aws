@@ -2,8 +2,8 @@ import os
 
 
 class Constants:
-    DYNAMO_TABLA_NAME = os.environ.get("DYNAMO_DB_TABLE_NAME")
-    ENVIRONMENT = os.environ.get("ENVIRONMENT")
+    DYNAMO_DB_TABLE = os.environ.get("DYNAMO_DB_TABLE")
+    ENVIRONMENT = os.environ.get("ENVIRONMENT", "local")
 
 
 constants = Constants()

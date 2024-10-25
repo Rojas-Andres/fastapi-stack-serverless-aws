@@ -6,9 +6,21 @@ services:
     hostname: dynamodblocal
     container_name: dynamodb-local
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /data"
+    user: root
     ports:
       - "8000:8000"
     volumes:
       - ./dynamodb_data:/data
     expose:
       - 8000
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin
+    ports:
+      - "8001:8001"
+    environment:
+      DYNAMO_ENDPOINT: "http://dynamodb:8000"
+      AWS_REGION: "us-west-2"
+      AWS_ACCESS_KEY_ID: local
+      AWS_SECRET_ACCESS_KEY: local
+    depends_on:
+      - dynamodb

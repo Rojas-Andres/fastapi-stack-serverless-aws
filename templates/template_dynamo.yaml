@@ -39,8 +39,43 @@ Resources:
         ReadCapacityUnits: !Ref DyanmoDBReadCapacityUnits
         WriteCapacityUnits: !Ref DyanmoDBWriteCapacityUnits
 
+
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub DbTable${Environment}
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: GSI1
+          KeySchema:
+            - AttributeName: SK
+              KeyType: HASH
+            - AttributeName: PK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: !Ref DynamoDBReadCapacityUnits
+            WriteCapacityUnits: !Ref DynamoDBWriteCapacityUnits
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref DyanmoDBReadCapacityUnits
+        WriteCapacityUnits: !Ref DyanmoDBWriteCapacityUnits
+
 Outputs:
   DynamoTableName:
     Value: !Sub DbAuthoTable${Environment}
     Export:
       Name: !Sub DbAuthoTable${Environment}
+  DynamoDBTable:
+    Value: !Sub DbTable${Environment}
+    Export:
+      Name: !Sub DbTable${Environment}

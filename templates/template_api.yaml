@@ -200,6 +200,60 @@ Resources:
             RestApiId: !Ref Api
             Path: /auth/social/register
             Method: POST
+
+  CompanyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../src/companies
+      FunctionName: !Sub companies-${StackName}-${Environment}
+      Description: !Sub companies microservice «${Environment}»
+      Environment:
+        Variables:
+          FUNCTION_NAME: !Sub companies-${StackName}-${Environment}
+          TOKEN_EXPIRATION: !Ref TokenExpiration
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - VPCAccessPolicy : {}
+      Layers:
+        - !Ref LayerShared
+      Events:
+        validateCompany:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /companies/health/
+            Method: GET
+            Auth:
+              Authorizer: NONE
+        CreateCompany:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /companies/
+            Method: POST
+            Auth:
+              Authorizer: NONE
+        UpdateCompany:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /companies/{id}
+            Method: PATCH
+            Auth:
+              Authorizer: NONE
+        GetCompany:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /companies/{id}
+            Method: GET
+        SocialRegister:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /auth/social/register
+            Method: POST
+
   # NotificationFunction:
   #   Type: AWS::Serverless::Function
   #   Properties:

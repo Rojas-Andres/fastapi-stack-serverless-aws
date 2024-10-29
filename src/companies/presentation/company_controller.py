@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter, HTTPException
 from application.services import CompanyService
 from fastapi import status as response_status
@@ -29,6 +30,20 @@ async def api_health(
     :rtype: dict
     """
     return {"response": "Service is ok"}
+
+
+@router.get(
+    "/show_envs",
+    status_code=response_status.HTTP_200_OK,
+)
+async def api_show_envs_local(
+    request: Request,
+):
+    """
+    Permite que un usuario inicie sesión en el sistema.
+    """
+    envs = os.environ
+    return {"response": str(envs)}
 
 
 @router.post("/")

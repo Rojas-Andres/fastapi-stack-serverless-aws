@@ -55,10 +55,10 @@ Globals:
       - x86_64
     Environment:
       Variables:
-        ENVIRONMENT: !Ref Environment
         SECRET_KEY: !Ref SecretKey
         SENDGRID_API_KEY: !Ref SendGridApiKey
         DYNAMO_DB_TABLE: !Ref DynamoDBTable
+        ENVIRONMENT_SAM: !Ref Environment
 Resources:
   LayerShared:
     Type: AWS::Serverless::LayerVersion
@@ -251,13 +251,14 @@ Resources:
             RestApiId: !Ref Api
             Path: /companies/{id}
             Method: GET
-        SocialRegister:
+        ShowEnvsApiLocal:
           Type: Api
           Properties:
             RestApiId: !Ref Api
-            Path: /auth/social/register
-            Method: POST
-
+            Path: /companies/show_envs
+            Method: GET
+            Auth:
+              Authorizer: NONE
   # NotificationFunction:
   #   Type: AWS::Serverless::Function
   #   Properties:

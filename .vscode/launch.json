@@ -1,0 +1,13 @@
+{
+    "configurations": [
+        // Local
+        {
+            "name": "Python Local",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/local.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+    ]
+}

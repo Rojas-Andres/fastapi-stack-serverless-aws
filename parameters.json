@@ -1,6 +1,6 @@
 {
     "StackName": "localStack",
-    "Environment": "local",
+    "Environment": "local-sam",
     "DynamoDBReadCapacityUnits": "10",
     "DynamoDBWriteCapacityUnits": "10",
     "GlobalTimeout": "300"

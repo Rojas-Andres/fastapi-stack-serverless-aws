@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from shared.logs.domain.entities import Log
 
 

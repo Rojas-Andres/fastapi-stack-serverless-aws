@@ -1,5 +1,6 @@
-import boto3
 import time
+
+import boto3
 
 # Configuración de DynamoDB local
 dynamodb = boto3.resource("dynamodb", endpoint_url="http://localhost:8000")

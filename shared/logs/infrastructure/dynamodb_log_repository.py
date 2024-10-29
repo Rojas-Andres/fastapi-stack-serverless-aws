@@ -1,6 +1,6 @@
-from logs.domain.repositories import LogRepository
-from logs.domain.entities import Log
 from shared.infrastructure.dynamodb_repository import DynamoDBRepository
+from shared.logs.domain.entities import Log
+from shared.logs.domain.repositories import LogRepository
 
 
 class DynamoDBLogRepository(DynamoDBRepository, LogRepository):
@@ -10,7 +10,7 @@ class DynamoDBLogRepository(DynamoDBRepository, LogRepository):
             "timestamp": log.timestamp,
             "status_code": log.status_code,
             "response_body": log.response_body,
-            "request_body": log.request_body ,
+            "request_body": log.request_body,
             "params": log.params,
             "url": log.url,
         }

@@ -1,6 +1,7 @@
-from logs.domain.repositories import LogRepository
-from logs.domain.entities import Log
 from datetime import datetime
+
+from shared.logs.domain.entities import Log
+from shared.logs.domain.repositories import LogRepository
 
 
 class LogService:

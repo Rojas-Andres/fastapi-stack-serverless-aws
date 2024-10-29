@@ -1,7 +1,9 @@
+import uuid
+
 from domain.entities import Company
 from domain.exceptions import CompanyNotFoundException
-import uuid
 from infrastructure.dynamodb_company_repository import DynamoDBCompanyRepository
+
 from shared.infrastructure.database import table
 
 

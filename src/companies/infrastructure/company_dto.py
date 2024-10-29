@@ -1,5 +1,6 @@
-from domain.entities import Company
 from typing import Dict
+
+from domain.entities import Company
 
 
 class CompanyDTO:

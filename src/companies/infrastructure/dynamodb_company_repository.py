@@ -1,5 +1,6 @@
-from domain.repositories import CompanyRepository
 from domain.entities import Company
+from domain.repositories import CompanyRepository
+
 from shared.infrastructure.dynamodb_repository import DynamoDBRepository
 
 

@@ -9,8 +9,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 from presentation.company_controller import router as company_router
 from starlette.requests import Request
-import uuid
-from datetime import datetime
+
+from shared.infrastructure.database import table_logs
+from shared.logs.application.services import LogService
+from shared.logs.infrastructure.dynamodb_log_repository import DynamoDBLogRepository
 
 app = FastAPI(
     debug=os.getenv("DEBUG", False),
@@ -25,69 +27,46 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-def clean_sensitive_data(data, sensitive_keys=None):
-    if sensitive_keys is None:
-        sensitive_keys = {
-            "password",
-            "secret",
-            "token",
-            "access_token",
-            "refresh_token",
-        }
-
-    def _clean(item):
-        if isinstance(item, dict):
-            return {
-                k: _clean(v) if k not in sensitive_keys else "REDACTED"
-                for k, v in item.items()
-            }
-        elif isinstance(item, list):
-            return [_clean(i) for i in item]
-        return item
-
-    return _clean(data)
+log_repository = DynamoDBLogRepository(table_logs)
+log_service = LogService(log_repository)
 
 
 @app.middleware("http")
-async def log_request_and_response(request: Request, call_next):
-    request_id = str(uuid.uuid4())
-    method = request.method
+async def log_requests(request: Request, call_next):
     url = str(request.url)
-    headers = dict(request.headers)
-    query_params = dict(request.query_params)
+    params = dict(request.query_params)
 
     try:
-        body = (
-            await request.json() if request.method in ["POST", "PUT", "PATCH"] else {}
-        )
-        body = clean_sensitive_data(body)
-    except Exception:
-        body = {}
+        request_body = await request.json()
+    except:
+        request_body = None
 
     response = await call_next(request)
-
     status_code = response.status_code
-    response_body = await response.body()
 
-    log_data = {
-        "request_id": request_id,
-        "timestamp": datetime.utcnow().isoformat(),
-        "method": method,
-        "url": url,
-        "headers": headers,
-        "query_params": query_params,
-        "request_body": body,
-        "status_code": status_code,
-        "response_body": response_body.decode(
-            "utf-8"
-        ),  # Decodifica el cuerpo de la respuesta
-    }
-
+    response_body = None
     try:
-        table.put_item(Item=log_data)
+        if hasattr(response, "body"):
+            response_body = response.body.decode("utf-8")
+        elif hasattr(response, "body_iterator"):
+            chunks = [chunk async for chunk in response.body_iterator]
+            response_body = b"".join(chunks).decode("utf-8")
+
+            async def new_body_iterator():
+                for chunk in chunks:
+                    yield chunk
+
+            response.body_iterator = new_body_iterator()
     except Exception as e:
-        print(f"Error guardando la solicitud y respuesta en DynamoDB: {e}")
+        response_body = f"Error al leer el cuerpo de la respuesta: {e}"
+    log_service.log_response(
+        api=request.scope["path"],
+        status_code=status_code,
+        response_body=response_body,
+        request_body=request_body,
+        params=params,
+        url=url,
+    )
 
     return response
 

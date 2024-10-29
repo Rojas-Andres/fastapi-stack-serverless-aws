@@ -7,6 +7,7 @@ import sys
 
 import uvicorn
 from fastapi import FastAPI, Request
+import os
 
 config = configparser.ConfigParser()
 
@@ -17,11 +18,13 @@ for key, value in config.items("pythonpath"):
 
 from dotenv import load_dotenv
 
+os.environ["ENDPOINT_URL_DYNAMO"] = "http://127.0.0.1:8000"
 load_dotenv(dotenv_path=".env")
+
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from src.auth.app import router as auth_router
-from fastapi.responses import JSONResponse
 
 # from src.user.app import router as user_router
 from src.companies.presentation.company_controller import router as company_router
@@ -37,9 +40,9 @@ app.add_middleware(
     # max_age=3600,
 )
 
-from shared.logs.infrastructure.dynamodb_log_repository import DynamoDBLogRepository
 from shared.infrastructure.database import table_logs
 from shared.logs.application.services import LogService
+from shared.logs.infrastructure.dynamodb_log_repository import DynamoDBLogRepository
 
 log_repository = DynamoDBLogRepository(table_logs)
 log_service = LogService(log_repository)
@@ -47,28 +50,32 @@ log_service = LogService(log_repository)
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    # Obtenemos la URL y los parámetros
     url = str(request.url)
     params = dict(request.query_params)
 
-    # Obtenemos el cuerpo de la solicitud si está disponible
     try:
         request_body = await request.json()
     except:
         request_body = None
 
-    # Llamamos al siguiente middleware o al endpoint y capturamos la respuesta
     response = await call_next(request)
     status_code = response.status_code
 
     response_body = None
-    if isinstance(response, JSONResponse):
-        response_body = response.body.decode("utf-8")
-    else:
-        response_body = b"".join(
-            [chunk async for chunk in response.body_iterator]
-        ).decode("utf-8")
+    try:
+        if hasattr(response, "body"):
+            response_body = response.body.decode("utf-8")
+        elif hasattr(response, "body_iterator"):
+            chunks = [chunk async for chunk in response.body_iterator]
+            response_body = b"".join(chunks).decode("utf-8")
 
+            async def new_body_iterator():
+                for chunk in chunks:
+                    yield chunk
+
+            response.body_iterator = new_body_iterator()
+    except Exception as e:
+        response_body = f"Error al leer el cuerpo de la respuesta: {e}"
     log_service.log_response(
         api=request.scope["path"],
         status_code=status_code,

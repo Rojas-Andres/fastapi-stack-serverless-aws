@@ -13,7 +13,6 @@ from fastapi.responses import JSONResponse
 from mangum import Mangum
 from starlette.requests import Request
 
-
 app = FastAPI(
     debug=os.getenv("DEBUG", False),
     title="Auth Service",

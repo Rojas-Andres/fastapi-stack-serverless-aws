@@ -6,7 +6,7 @@ Parameters:
   Environment:
     Description: Environment in which the resources will be deploy
     Type: String
-    Default: development
+    Default: local
   SecretKey:
     Description: secret key
     Type: String
@@ -44,6 +44,11 @@ Parameters:
   DynamoDBTable:
     Description: DynamoDB Table
     Type: String
+  EndPointDynamoDB:
+    Description: DynamoDB Table
+    Type: String
+    Default: http://dynamodb-local:8000
+
 Globals:
   Function:
     Timeout: !Ref GlobalTimeout
@@ -59,6 +64,8 @@ Globals:
         SENDGRID_API_KEY: !Ref SendGridApiKey
         DYNAMO_DB_TABLE: !Ref DynamoDBTable
         ENVIRONMENT_SAM: !Ref Environment
+        ENDPOINT_URL_DYNAMO: !Ref EndPointDynamoDB
+
 Resources:
   LayerShared:
     Type: AWS::Serverless::LayerVersion

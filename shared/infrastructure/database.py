@@ -8,7 +8,7 @@ def get_dynamodb_table(table_name: str):
         dynamodb = boto3.resource(
             "dynamodb",
             region_name="us-west-2",
-            endpoint_url=constants.END_POINT_URL_LOCAL,
+            endpoint_url=constants.ENDPOINT_URL_DYNAMO,
         )
     else:
         dynamodb = boto3.resource("dynamodb", region_name="us-west-2")

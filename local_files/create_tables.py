@@ -86,6 +86,33 @@ def create_tables():
     except Exception as e:
         print(f"Error al crear la tabla DbTabledevelopment: {e}")
 
+    try:
+        table_3 = dynamodb.create_table(
+            TableName="DbTableLogsdevelopment",
+            KeySchema=[
+                {
+                    "AttributeName": "api",
+                    "KeyType": "HASH",  # Llave primaria
+                },
+                {
+                    "AttributeName": "timestamp",
+                    "KeyType": "RANGE",  # Llave de rango
+                },
+            ],
+            AttributeDefinitions=[
+                {"AttributeName": "api", "AttributeType": "S"},
+                {"AttributeName": "timestamp", "AttributeType": "N"},
+            ],
+            ProvisionedThroughput={"ReadCapacityUnits": 5, "WriteCapacityUnits": 5},
+        )
+        print("Creando la tabla DbTabledevelopment...")
+        table_3.meta.client.get_waiter("table_exists").wait(
+            TableName="DbTableLogsdevelopment"
+        )
+        print("Tabla DbTableLogsdevelopment creada con éxito.")
+    except Exception as e:
+        print(f"Error al crear la tabla DbTableLogsdevelopment: {e}")
+
 
 if __name__ == "__main__":
     create_tables()

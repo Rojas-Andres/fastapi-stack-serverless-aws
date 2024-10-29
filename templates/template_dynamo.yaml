@@ -70,6 +70,24 @@ Resources:
         ReadCapacityUnits: !Ref DyanmoDBReadCapacityUnits
         WriteCapacityUnits: !Ref DyanmoDBWriteCapacityUnits
 
+  DynamoDBTableLogs:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub DbTableLogs${Environment}
+      AttributeDefinitions:
+        - AttributeName: api
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: N
+      KeySchema:
+        - AttributeName: api
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref DyanmoDBReadCapacityUnits
+        WriteCapacityUnits: !Ref DyanmoDBWriteCapacityUnits
+
 Outputs:
   DynamoTableName:
     Value: !Sub DbAuthoTable${Environment}

@@ -10,7 +10,7 @@ Parameters:
   Environment:
     Description: Environment in which the resources will be deploy
     Type: String
-    Default: development
+    Default: local
   DyanmoDBReadCapacityUnits:
     Description: dynamodb read capacity units
     Type: String
@@ -78,7 +78,7 @@ Resources:
         - AttributeName: api
           AttributeType: S
         - AttributeName: timestamp
-          AttributeType: N
+          AttributeType: S
       KeySchema:
         - AttributeName: api
           KeyType: HASH
@@ -97,3 +97,7 @@ Outputs:
     Value: !Sub DbTable${Environment}
     Export:
       Name: !Sub DbTable${Environment}
+  DynamoDBTableLogs:
+    Value: !Sub DbTableLogs${Environment}
+    Export:
+      Name: !Sub DbTableLogs${Environment}

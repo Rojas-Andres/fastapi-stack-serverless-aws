@@ -97,6 +97,7 @@ Resources:
         # Dynamo
         DynamoTableName: !GetAtt DynamoStack.Outputs.DynamoTableName
         DynamoDBTable: !GetAtt DynamoStack.Outputs.DynamoDBTable
+        DynamoDBTableLogs: !GetAtt DynamoStack.Outputs.DynamoDBTableLogs
         AuthorizerArn: !GetAtt AuthorizerStack.Outputs.AuthorizerArn
       Tags:
         Environment: !Ref Environment

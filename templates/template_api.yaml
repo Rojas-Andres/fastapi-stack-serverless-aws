@@ -48,7 +48,9 @@ Parameters:
     Description: DynamoDB Table
     Type: String
     Default: http://dynamodb-local:8000
-
+  DynamoDBTableLogs:
+    Description: DynamoDB Table
+    Type: String
 Globals:
   Function:
     Timeout: !Ref GlobalTimeout
@@ -65,6 +67,7 @@ Globals:
         DYNAMO_DB_TABLE: !Ref DynamoDBTable
         ENVIRONMENT_SAM: !Ref Environment
         ENDPOINT_URL_DYNAMO: !Ref EndPointDynamoDB
+        DYNAMO_DB_TABLE_LOGS: !Ref DynamoDBTableLogs
 
 Resources:
   LayerShared:

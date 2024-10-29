@@ -5,6 +5,8 @@ import boto3
 # Configuración de DynamoDB local
 dynamodb = boto3.resource("dynamodb", endpoint_url="http://localhost:8000")
 
+ENVIRONMENT = "development"
+
 
 def wait_for_table_creation(table_name):
     client = boto3.client("dynamodb", endpoint_url="http://localhost:8000")
@@ -28,7 +30,7 @@ def create_tables():
     try:
         print("creando tabla de AUTH")
         table_1 = dynamodb.create_table(
-            TableName="DbAuthoTabledevelopment",
+            TableName=f"DbAuthoTable{ENVIRONMENT}",
             KeySchema=[
                 {
                     "AttributeName": "uuid",
@@ -39,16 +41,16 @@ def create_tables():
             ProvisionedThroughput={"ReadCapacityUnits": 5, "WriteCapacityUnits": 5},
         )
         # table_1.meta.client.get_waiter('table_exists').wait(TableName='DbAuthoTabledevelopment')
-        print("Creando la tabla DbAuthoTabledevelopment...")
-        wait_for_table_creation("DbAuthoTabledevelopment")
-        print("Tabla DbAuthoTabledevelopment creada con éxito.")
+        print(f"Creando la tabla DbAuthoTable{ENVIRONMENT}...")
+        wait_for_table_creation(f"DbAuthoTable{ENVIRONMENT}")
+        print(f"Tabla DbAuthoTable{ENVIRONMENT} creada con éxito.")
     except Exception as e:
-        print(f"Error al crear la tabla DbAuthoTabledevelopment: {e}")
+        print(f"Error al crear la tabla DbAuthoTable{ENVIRONMENT}: {e}")
 
     # Crear la tabla DbTable
     try:
         table_2 = dynamodb.create_table(
-            TableName="DbTabledevelopment",
+            TableName=f"DbTable{ENVIRONMENT}",
             KeySchema=[
                 {
                     "AttributeName": "PK",
@@ -79,17 +81,17 @@ def create_tables():
             ],
             ProvisionedThroughput={"ReadCapacityUnits": 5, "WriteCapacityUnits": 5},
         )
-        print("Creando la tabla DbTabledevelopment...")
+        print(f"Creando la tabla DbTable{ENVIRONMENT}...")
         table_2.meta.client.get_waiter("table_exists").wait(
-            TableName="DbTabledevelopment"
+            TableName=f"DbTable{ENVIRONMENT}"
         )
-        print("Tabla DbTabledevelopment creada con éxito.")
+        print(f"Tabla DbTable{ENVIRONMENT} creada con éxito.")
     except Exception as e:
-        print(f"Error al crear la tabla DbTabledevelopment: {e}")
+        print(f"Error al crear la tabla DbTable{ENVIRONMENT}: {e}")
 
     try:
         table_3 = dynamodb.create_table(
-            TableName="DbTableLogsdevelopment",
+            TableName=f"DbTableLogs{ENVIRONMENT}",
             KeySchema=[
                 {
                     "AttributeName": "api",
@@ -106,13 +108,13 @@ def create_tables():
             ],
             ProvisionedThroughput={"ReadCapacityUnits": 5, "WriteCapacityUnits": 5},
         )
-        print("Creando la tabla DbTabledevelopment...")
+        print(f"Creando la tabla DbTable{ENVIRONMENT}...")
         table_3.meta.client.get_waiter("table_exists").wait(
-            TableName="DbTableLogsdevelopment"
+            TableName=f"DbTableLogs{ENVIRONMENT}"
         )
-        print("Tabla DbTableLogsdevelopment creada con éxito.")
+        print(f"Tabla DbTableLogs{ENVIRONMENT} creada con éxito.")
     except Exception as e:
-        print(f"Error al crear la tabla DbTableLogsdevelopment: {e}")
+        print(f"Error al crear la tabla DbTableLogs{ENVIRONMENT}: {e}")
 
 
 if __name__ == "__main__":

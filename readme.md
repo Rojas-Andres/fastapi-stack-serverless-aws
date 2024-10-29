@@ -16,3 +16,9 @@
 - Correr proyecto con sam
     - make sam-build
     - make sam-local
+
+## Consideraciones
+
+- El .env es el que toma las variables de entorno en para python como tal (el cual se encuentra aca shared/constants.py ) y en parameters.json son parametros de los template de cloudformation
+
+- 

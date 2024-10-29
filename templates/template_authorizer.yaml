@@ -6,7 +6,7 @@ Parameters:
   Environment:
     Description: Environment in which the resources will be deploy
     Type: String
-    Default: development
+    Default: local
   DynamoTableName:
     Description: Dynamo Table name
     Type: String

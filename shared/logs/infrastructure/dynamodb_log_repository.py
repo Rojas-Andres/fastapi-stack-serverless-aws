@@ -6,12 +6,12 @@ from shared.infrastructure.dynamodb_repository import DynamoDBRepository
 class DynamoDBLogRepository(DynamoDBRepository, LogRepository):
     def save_log(self, log: Log) -> None:
         item = {
-            "PK": f"API#{log.api}",
-            "SK": log.timestamp,
-            "StatusCode": log.status_code,
-            "ResponseBody": log.response_body,
-            "RequestBody": log.request_body,
-            "Params": log.params,
-            "URL": log.url,
+            "api": log.api,
+            "timestamp": log.timestamp,
+            "status_code": log.status_code,
+            "response_body": log.response_body,
+            "request_body": log.request_body ,
+            "params": log.params,
+            "url": log.url,
         }
         self.put_item(item)

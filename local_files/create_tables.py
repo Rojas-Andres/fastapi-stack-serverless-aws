@@ -101,7 +101,7 @@ def create_tables():
             ],
             AttributeDefinitions=[
                 {"AttributeName": "api", "AttributeType": "S"},
-                {"AttributeName": "timestamp", "AttributeType": "N"},
+                {"AttributeName": "timestamp", "AttributeType": "S"},
             ],
             ProvisionedThroughput={"ReadCapacityUnits": 5, "WriteCapacityUnits": 5},
         )

@@ -11,6 +11,7 @@
 
 - Comandos a correr Makefile creacion de dynamo y tablas local
     - make up
+    - pip install boto3
     - make create-tables-dynamo
 
 - Correr proyecto con sam

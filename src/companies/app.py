@@ -7,7 +7,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
-from presentation.company_controller import router as company_router
+from presentation_companies.company_controller import router as company_router
 from starlette.requests import Request
 
 from shared.infrastructure.database import table_logs

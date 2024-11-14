@@ -24,10 +24,10 @@ load_dotenv(dotenv_path=".env")
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from src.auth.app import router as auth_router
+from src.auth.presentation_auth.auth_controller import router as auth_router
 
 # from src.user.app import router as user_router
-from src.companies.presentation.company_controller import router as company_router
+from src.companies.presentation_companies.company_controller import router as company_router
 
 app = FastAPI()
 

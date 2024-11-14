@@ -2,5 +2,6 @@
     "StackName": "localStack",
     "DynamoDBReadCapacityUnits": "10",
     "DynamoDBWriteCapacityUnits": "10",
-    "GlobalTimeout": "300"
+    "GlobalTimeout": "300",
+    "SecretKey": "secretkey"
 }

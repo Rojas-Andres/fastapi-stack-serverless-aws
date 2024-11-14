@@ -1,11 +1,12 @@
 import os
 
-from application.services import CompanyService
-from domain.exceptions import CompanyNotFoundException
-from fastapi import APIRouter, HTTPException
+from application_companies.services import CompanyService
+from domain_companies.exceptions import CompanyNotFoundException
+from fastapi import APIRouter, Depends, Query, HTTPException
 from fastapi import status as response_status
-from presentation.schemas import CompanyCreate
+from presentation_companies.schemas import CompanyCreate
 from starlette.requests import Request
+from typing import Optional, Dict, Any
 
 router = APIRouter(prefix="/companies")
 
@@ -69,3 +70,13 @@ def api_update_company(request: Request, company_id: str, name: str, address: st
 def api_delete_company(request: Request, company_id: str):
     company_service.delete_company(company_id)
     return {"message": "Company deleted"}
+
+
+@router.get("/")
+def api_get_companies(
+    limit: int = Query(10, le=100), last_evaluated_key: Optional[str] = Query(None)
+):
+    result = company_service.get_paginated_companies(
+        limit=limit, last_evaluated_key=last_evaluated_key
+    )
+    return result

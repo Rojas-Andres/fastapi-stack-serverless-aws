@@ -1,9 +1,10 @@
 import uuid
 
-from domain.entities import Company
-from domain.exceptions import CompanyNotFoundException
-from infrastructure.dynamodb_company_repository import DynamoDBCompanyRepository
-
+from domain_companies.entities import Company
+from domain_companies.exceptions import CompanyNotFoundException
+from infrastructure_companies.dynamodb_company_repository import DynamoDBCompanyRepository
+from typing import List, Dict, Any, Optional
+import json
 from shared.infrastructure.database import table
 
 
@@ -29,3 +30,14 @@ class CompanyService:
 
     def delete_company(self, company_id: str) -> None:
         self.repository_company.delete(company_id)
+
+    def get_paginated_companies(
+        self, limit: int = 10, last_evaluated_key: Optional[str] = None
+    ) -> Dict[str, Any]:
+        if last_evaluated_key:
+            last_evaluated_key = last_evaluated_key.replace("'", '"')
+            last_evaluated_key = json.loads(last_evaluated_key)
+        companies, new_last_evaluated_key = (
+            self.repository_company.get_companies_paginated(limit, last_evaluated_key)
+        )
+        return {"items": companies, "last_evaluated_key": new_last_evaluated_key}

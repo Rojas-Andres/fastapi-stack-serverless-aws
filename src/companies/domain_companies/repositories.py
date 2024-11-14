@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-
-from domain.entities import Company
+from typing import Tuple, List, Optional
+from domain_companies.entities import Company
 
 
 class CompanyRepository(ABC):
@@ -18,4 +18,13 @@ class CompanyRepository(ABC):
 
     @abstractmethod
     def delete(self, company_id: str) -> None:
+        pass
+
+    @abstractmethod
+    def get_companies_paginated(
+        self, limit: int, last_evaluated_key: Optional[dict] = None
+    ) -> Tuple[List[Company], Optional[dict]]:
+        """
+        Devuelve una lista de compañías y una clave de paginación.
+        """
         pass

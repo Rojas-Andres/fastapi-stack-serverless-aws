@@ -4,18 +4,19 @@ Módulo que contiene la aplicación FastAPI que maneja las rutas de autenticaci�
 
 import os
 
-from fastapi import APIRouter, Depends, FastAPI, HTTPException
-from fastapi import status as response_status
-from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import RequestValidationError
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from mangum import Mangum
+from presentation_auth.auth_controller import router as auth_router
 from starlette.requests import Request
+
+from shared.infrastructure.database import table_logs
+from shared.logs.application.services import LogService
+from shared.logs.infrastructure.dynamodb_log_repository import DynamoDBLogRepository
 
 app = FastAPI(
     debug=os.getenv("DEBUG", False),
-    title="Auth Service",
+    title="Company Service",
 )
 
 app.add_middleware(
@@ -26,87 +27,49 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-router = APIRouter(prefix="/auth")
+log_repository = DynamoDBLogRepository(table_logs)
+log_service = LogService(log_repository)
 
 
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    """
-    Maneja las excepciones de validación que ocurren al procesar una solicitud HTTP en FastAPI.
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    url = str(request.url)
+    params = dict(request.query_params)
 
-    :param request: La solicitud HTTP que causó la excepción.
-    :type request: Request
-    :param exc: La excepción de validación que fue capturada.
-    :type exc: RequestValidationError
-    :return: Una respuesta JSON que describe los errores de validación y el contenido de la solicitud.
-    :rtype: JSONResponse
-    """
-    return JSONResponse(
-        status_code=response_status.HTTP_400_BAD_REQUEST,
-        content=jsonable_encoder({"errors": exc.errors(), "body": exc.body}),
+    try:
+        request_body = await request.json()
+    except:
+        request_body = None
+
+    response = await call_next(request)
+    status_code = response.status_code
+
+    response_body = None
+    try:
+        if hasattr(response, "body"):
+            response_body = response.body.decode("utf-8")
+        elif hasattr(response, "body_iterator"):
+            chunks = [chunk async for chunk in response.body_iterator]
+            response_body = b"".join(chunks).decode("utf-8")
+
+            async def new_body_iterator():
+                for chunk in chunks:
+                    yield chunk
+
+            response.body_iterator = new_body_iterator()
+    except Exception as e:
+        response_body = f"Error al leer el cuerpo de la respuesta: {e}"
+    log_service.log_response(
+        api=request.scope["path"],
+        status_code=status_code,
+        response_body=response_body,
+        request_body=request_body,
+        params=params,
+        url=url,
     )
 
-
-@router.post(
-    "/signup",
-    status_code=response_status.HTTP_201_CREATED,
-)
-async def singup(request: Request):
-    """
-    Registra un nuevo usuario en el sistema.
-
-    :param request: La solicitud HTTP recibida.
-    :type request: Request
-    :param user: Los datos del usuario a ser registrados.
-    :param db: Una sesión de base de datos.
-    :type db: Session
-    :return: Una respuesta que indica el éxito del registro.
-    :rtype: dict
-    """
-    return {"response": "User create ok"}
+    return response
 
 
-@router.post(
-    "/signin",
-    status_code=response_status.HTTP_200_OK,
-)
-async def signin(
-    request: Request,
-):
-    """
-    Permite que un usuario inicie sesión en el sistema.
-
-    :param request: La solicitud HTTP recibida.
-    :type request: Request
-    :param credentials: Las credenciales de inicio de sesión proporcionadas por el usuario.
-    :param db: Una sesión de base de datos.
-    :type db: Session
-    :return: Una respuesta que indica el éxito del inicio de sesión.
-    :rtype: dict
-    """
-    return {"response": "User signin ok"}
-
-
-@router.get(
-    "/health",
-    status_code=response_status.HTTP_200_OK,
-)
-async def api_health(
-    request: Request,
-):
-    """
-    Permite que un usuario inicie sesión en el sistema.
-
-    :param request: La solicitud HTTP recibida.
-    :type request: Request
-    :param credentials: Las credenciales de inicio de sesión proporcionadas por el usuario.
-    :param db: Una sesión de base de datos.
-    :type db: Session
-    :return: Una respuesta que indica el éxito del inicio de sesión.
-    :rtype: dict
-    """
-    return {"response": "Service is ok"}
-
-
-app.include_router(router)
+app.include_router(auth_router)
 handler = Mangum(app)

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Tuple, List, Optional
+from typing import List, Optional, Tuple
+
 from domain_companies.entities import Company
 
 

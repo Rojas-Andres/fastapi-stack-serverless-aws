@@ -1,8 +1,9 @@
-from domain_auth.entities import User
-from domain_auth.repositories import UserRepository
-from shared.infrastructure.dynamodb_repository import DynamoDBRepository
 from boto3.dynamodb.conditions import Key
+from domain_auth.entities import User, UserCommon
 from domain_auth.exceptions import UserAlreadyExistsException
+from domain_auth.repositories import UserRepository
+
+from shared.infrastructure.dynamodb_repository import DynamoDBRepository
 
 
 class DynamoDBUserRepository(DynamoDBRepository, UserRepository):
@@ -15,6 +16,7 @@ class DynamoDBUserRepository(DynamoDBRepository, UserRepository):
             "phone": user.phone,
             "first_name": user.first_name,
             "email": user.email,
+            "address": user.address,
         }
         self.put_item(item)
         return user
@@ -33,12 +35,30 @@ class DynamoDBUserRepository(DynamoDBRepository, UserRepository):
         return None
 
     def find_by_email(self, email: str) -> User:
+        """
+        Find a user by their email address.
+
+        Args:
+            email (str): The email address of the user to find.
+
+        Returns:
+            User: The user object if found.
+            bool: False if no user is found with the given email.
+        """
         query_kwargs = {
-            "IndexName": "GSI_Email",  # Nombre del índice que usa email como clave de partición
+            "IndexName": "GSI_Email",
             "KeyConditionExpression": Key("email").eq(email),
         }
         response = self.table.query(**query_kwargs)
         items = response.get("Items", [])
-        if items:
-            raise UserAlreadyExistsException(f"User with email {email} already exists.")
-        return None
+        if not items:
+            return False
+        return User(
+            user_id=items[0]["SK"],
+            username=items[0]["username"],
+            password=items[0]["password"],
+            address=items[0]["address"],
+            phone=items[0]["phone"],
+            first_name=items[0]["first_name"],
+            email=email,
+        )

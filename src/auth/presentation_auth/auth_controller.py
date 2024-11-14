@@ -4,16 +4,16 @@ Módulo que contiene la aplicación FastAPI que maneja las rutas de autenticaci�
 
 import os
 
+from application_auth.services import AuthService, UserService
+from domain_auth.exceptions import UserAlreadyExistsException, ValidationError
 from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi import status as response_status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from presentation_auth.schemas import UserSignin, UserCreate
+from presentation_auth.schemas import UserCreate, UserSignin
 from starlette.requests import Request
-from application_auth.services import UserService
-from domain_auth.exceptions import UserAlreadyExistsException
 
 app = FastAPI(
     debug=os.getenv("DEBUG", False),
@@ -31,6 +31,7 @@ app.add_middleware(
 router = APIRouter(prefix="/auth")
 
 user_service = UserService()
+auth_service = AuthService()
 
 
 @app.exception_handler(RequestValidationError)
@@ -55,7 +56,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     "/signup",
     status_code=response_status.HTTP_201_CREATED,
 )
-async def singup(request: Request, user: UserCreate):
+async def api_singup(request: Request, user: UserCreate):
     """
     Registra un nuevo usuario en el sistema.
 
@@ -78,9 +79,9 @@ async def singup(request: Request, user: UserCreate):
     "/signin",
     status_code=response_status.HTTP_200_OK,
 )
-async def signin(
+async def api_signin(
     request: Request,
-    user: UserSignin,
+    user_login: UserSignin,
 ):
     """
     Permite que un usuario inicie sesión en el sistema.
@@ -93,7 +94,15 @@ async def signin(
     :return: Una respuesta que indica el éxito del inicio de sesión.
     :rtype: dict
     """
-    return {"response": "User signin ok"}
+    try:
+        user = user_service.validate_user_login(**user_login.dict())
+        token = auth_service.create_auth_login(user.email)
+        return {
+            "token": token,
+        }
+    except (UserAlreadyExistsException, ValidationError) as e:
+        print(e)
+        raise HTTPException(status_code=400, detail=e.message)
 
 
 @router.get(

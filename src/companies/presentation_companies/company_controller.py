@@ -1,12 +1,12 @@
 import os
+from typing import Any, Dict, Optional
 
 from application_companies.services import CompanyService
 from domain_companies.exceptions import CompanyNotFoundException
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi import status as response_status
 from presentation_companies.schemas import CompanyCreate
 from starlette.requests import Request
-from typing import Optional, Dict, Any
 
 router = APIRouter(prefix="/companies")
 

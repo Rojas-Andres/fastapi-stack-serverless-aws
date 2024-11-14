@@ -1,6 +1,16 @@
-class UserNotFoundException(Exception):
-    pass
+class BaseException(Exception):
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
 
 
-class UserAlreadyExistsException(Exception):
-    pass
+class UserNotFoundException(Exception): ...
+
+
+class UserAlreadyExistsException(BaseException): ...
+
+
+class UserPasswordInvalid(Exception): ...
+
+
+class ValidationError(BaseException): ...

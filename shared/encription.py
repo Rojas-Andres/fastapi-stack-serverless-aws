@@ -2,7 +2,11 @@
 Archivo que contiene la clase Hasher, la cual proporciona métodos para trabajar con contraseñas y hashes.
 """
 
+import time
+
+import jwt
 from passlib.context import CryptContext
+from shared.constants import constants
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -37,3 +41,24 @@ class Hasher:
         :rtype: str
         """
         return pwd_context.hash(password)
+
+
+def generate_token(uuid: str) -> str:
+    """
+    Generates a JWT token with the given UUID and an expiration time.
+
+    Args:
+        uuid (str): The UUID to include in the token payload.
+
+    Returns:
+        str: The encoded JWT token as a string.
+    """
+
+    data = {}
+    expires_at: int = int(time.time()) + constants.TOKEN_API_EXPIRATION
+    data["expires_at"] = expires_at
+    data["uuid"] = uuid
+    encode_data: str = jwt.encode(
+        payload=data, key=constants.SECRET_KEY, algorithm="HS256"
+    )
+    return encode_data

@@ -1,9 +1,11 @@
+import json
+from typing import List, Optional, Tuple
+
+from boto3.dynamodb.conditions import Attr, Key
 from domain_companies.entities import Company
 from domain_companies.repositories import CompanyRepository
-from typing import List, Tuple, Optional
-from boto3.dynamodb.conditions import Attr, Key
+
 from shared.infrastructure.dynamodb_repository import DynamoDBRepository
-import json
 
 
 class DynamoDBCompanyRepository(DynamoDBRepository, CompanyRepository):

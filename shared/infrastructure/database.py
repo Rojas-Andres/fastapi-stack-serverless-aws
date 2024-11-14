@@ -17,3 +17,4 @@ def get_dynamodb_table(table_name: str):
 
 table = get_dynamodb_table(constants.DYNAMO_DB_TABLE)
 table_logs = get_dynamodb_table(constants.DYNAMO_DB_TABLE_LOGS)
+table_auth = get_dynamodb_table(constants.DYNAMO_DB_TABLE_AUTH)

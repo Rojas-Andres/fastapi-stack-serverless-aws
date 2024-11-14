@@ -3,11 +3,11 @@ Execute this file to run the server local
 """
 
 import configparser
+import os
 import sys
 
 import uvicorn
 from fastapi import FastAPI, Request
-import os
 
 config = configparser.ConfigParser()
 

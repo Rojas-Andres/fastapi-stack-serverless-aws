@@ -27,7 +27,9 @@ from fastapi.responses import JSONResponse
 from src.auth.presentation_auth.auth_controller import router as auth_router
 
 # from src.user.app import router as user_router
-from src.companies.presentation_companies.company_controller import router as company_router
+from src.companies.presentation_companies.company_controller import (
+    router as company_router,
+)
 
 app = FastAPI()
 

@@ -2,7 +2,9 @@ import uuid
 
 from domain_companies.entities import Company
 from domain_companies.exceptions import CompanyNotFoundException
-from infrastructure_companies.dynamodb_company_repository import DynamoDBCompanyRepository
+from infrastructure_companies.dynamodb_company_repository import (
+    DynamoDBCompanyRepository,
+)
 from typing import List, Dict, Any, Optional
 import json
 from shared.infrastructure.database import table

@@ -64,6 +64,7 @@ def create_tables():
             AttributeDefinitions=[
                 {"AttributeName": "PK", "AttributeType": "S"},
                 {"AttributeName": "SK", "AttributeType": "S"},
+                {"AttributeName": "email", "AttributeType": "S"},
             ],
             GlobalSecondaryIndexes=[
                 {
@@ -77,7 +78,21 @@ def create_tables():
                         "ReadCapacityUnits": 5,
                         "WriteCapacityUnits": 5,
                     },
-                }
+                },
+                {
+                    "IndexName": "GSI_Email",  # Nombre del índice para email
+                    "KeySchema": [
+                        {
+                            "AttributeName": "email",
+                            "KeyType": "HASH",
+                        },  # email como clave de partición
+                    ],
+                    "Projection": {"ProjectionType": "ALL"},
+                    "ProvisionedThroughput": {
+                        "ReadCapacityUnits": 5,
+                        "WriteCapacityUnits": 5,
+                    },
+                },
             ],
             ProvisionedThroughput={"ReadCapacityUnits": 5, "WriteCapacityUnits": 5},
         )

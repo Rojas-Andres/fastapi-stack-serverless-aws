@@ -1,0 +1,3 @@
+-r src/auth/requirements.txt
+-r src/authorizer/requirements.txt
+-r src/companies/requirements.txt

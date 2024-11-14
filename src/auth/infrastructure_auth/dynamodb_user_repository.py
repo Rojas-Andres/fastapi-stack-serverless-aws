@@ -2,6 +2,7 @@ from domain_auth.entities import User
 from domain_auth.repositories import UserRepository
 from shared.infrastructure.dynamodb_repository import DynamoDBRepository
 from boto3.dynamodb.conditions import Key
+from domain_auth.exceptions import UserAlreadyExistsException
 
 
 class DynamoDBUserRepository(DynamoDBRepository, UserRepository):
@@ -13,6 +14,7 @@ class DynamoDBUserRepository(DynamoDBRepository, UserRepository):
             "password": user.password,
             "phone": user.phone,
             "first_name": user.first_name,
+            "email": user.email,
         }
         self.put_item(item)
         return user
@@ -30,21 +32,13 @@ class DynamoDBUserRepository(DynamoDBRepository, UserRepository):
             )
         return None
 
-    def find_by_username(self, username: str) -> User:
+    def find_by_email(self, email: str) -> User:
         query_kwargs = {
-            "KeyConditionExpression": Key("PK").eq("USER")
-            & Key("username").eq(username)
+            "IndexName": "GSI_Email",  # Nombre del índice que usa email como clave de partición
+            "KeyConditionExpression": Key("email").eq(email),
         }
         response = self.table.query(**query_kwargs)
         items = response.get("Items", [])
         if items:
-            item = items[0]
-            return User(
-                user_id=item["SK"],
-                name=item["username"],
-                first_name=item.get("first_name"),
-                phone=item.get("phone"),
-                password=item.get("password"),
-                address=item.get("address"),
-            )
+            raise UserAlreadyExistsException(f"User with email {email} already exists.")
         return None

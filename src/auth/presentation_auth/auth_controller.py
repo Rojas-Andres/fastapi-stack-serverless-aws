@@ -10,8 +10,10 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from presentation_auth.schemas import UserSignin
+from presentation_auth.schemas import UserSignin, UserCreate
 from starlette.requests import Request
+from application_auth.services import UserService
+from domain_auth.exceptions import UserAlreadyExistsException
 
 app = FastAPI(
     debug=os.getenv("DEBUG", False),
@@ -27,6 +29,8 @@ app.add_middleware(
 )
 
 router = APIRouter(prefix="/auth")
+
+user_service = UserService()
 
 
 @app.exception_handler(RequestValidationError)
@@ -51,7 +55,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     "/signup",
     status_code=response_status.HTTP_201_CREATED,
 )
-async def singup(request: Request):
+async def singup(request: Request, user: UserCreate):
     """
     Registra un nuevo usuario en el sistema.
 
@@ -63,7 +67,11 @@ async def singup(request: Request):
     :return: Una respuesta que indica el éxito del registro.
     :rtype: dict
     """
-    return {"response": "User create ok"}
+    try:
+        return user_service.create_user(**user.dict())
+    except UserAlreadyExistsException as e:
+        print(e)
+        raise HTTPException(status_code=404, detail="User Already Exists")
 
 
 @router.post(

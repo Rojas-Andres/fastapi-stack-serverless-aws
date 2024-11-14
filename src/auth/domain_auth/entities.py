@@ -8,3 +8,4 @@ class User(BaseModel):
     first_name: str
     phone: str
     address: str
+    email: str

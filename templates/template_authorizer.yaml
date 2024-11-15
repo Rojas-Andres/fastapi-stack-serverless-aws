@@ -20,6 +20,12 @@ Parameters:
     Description: stack Name
     Type: String
     Default: stack-stack-name
+  DynamoDBTableLogs:
+    Description: DynamoDB Table
+    Type: String
+  DynamoDBTable:
+    Description: DynamoDB Table
+    Type: String
 Globals:
   Function:
     Timeout: !Ref GlobalTimeout
@@ -36,6 +42,16 @@ Globals:
         ENVIRONMENT_SAM: !Ref Environment
         REGION_AWS: !Ref AWS::Region
 Resources:
+  LayerShared:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      Description: Layer for Data Ingestor
+      ContentUri: ../shared
+      CompatibleRuntimes:
+        - python3.12
+    Metadata:
+      BuildMethod: makefile
+
   AuthorizerFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -47,7 +63,11 @@ Resources:
       Environment:
         Variables:
           FUNCTION_NAME: !Sub auth-${StackName}-${Environment}
+          DYNAMO_DB_TABLE_LOGS: !Ref DynamoDBTableLogs
           DYNAMO_DB_TABLE_AUTH: !Ref DynamoTableName
+          DYNAMO_DB_TABLE: !Ref DynamoDBTable
+      Layers:
+        - !Ref LayerShared
       Policies:
         - AmazonDynamoDBFullAccess
 

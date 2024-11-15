@@ -74,6 +74,8 @@ Resources:
         StackName: !Ref StackName
         # Dynamo
         DynamoTableName: !GetAtt DynamoStack.Outputs.DynamoTableName
+        DynamoDBTable: !GetAtt DynamoStack.Outputs.DynamoDBTable
+        DynamoDBTableLogs: !GetAtt DynamoStack.Outputs.DynamoDBTableLogs
       Tags:
         Environment: !Ref Environment
         StackName: !Ref StackName

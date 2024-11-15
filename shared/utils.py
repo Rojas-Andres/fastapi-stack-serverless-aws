@@ -75,7 +75,7 @@ def generate_policy_authorizer(event: dict, auth_service: AuthService):
         return generate_policy("user", "Deny")
     token = event.get("authorizationToken")
     token_decode = jwt.decode(jwt=token, key=constants.SECRET_KEY, algorithms=["HS256"])
-    user_id = auth_service.get_user_by_uuid(token_decode["uuid"])
-    if user_id:
-        return generate_policy(user_id, "Allow", token_decode)
+    user = auth_service.get_user_by_uuid(token_decode["uuid"])
+    if user:
+        return generate_policy(user.email, "Allow", token_decode)
     return generate_policy("user", "Deny")

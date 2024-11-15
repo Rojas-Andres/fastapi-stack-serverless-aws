@@ -20,7 +20,6 @@ Parameters:
     Description: stack Name
     Type: String
     Default: stack-stack-name
-
 Globals:
   Function:
     Timeout: !Ref GlobalTimeout
@@ -34,7 +33,8 @@ Globals:
       Variables:
         ENVIRONMENT: !Ref Environment
         SECRET_KEY: !Ref SecretKey
-
+        ENVIRONMENT_SAM: !Ref Environment
+        REGION_AWS: !Ref AWS::Region
 Resources:
   AuthorizerFunction:
     Type: AWS::Serverless::Function

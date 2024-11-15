@@ -69,6 +69,8 @@ Globals:
         ENDPOINT_URL_DYNAMO: !Ref EndPointDynamoDB
         DYNAMO_DB_TABLE_LOGS: !Ref DynamoDBTableLogs
         DYNAMO_DB_TABLE_AUTH: !Ref DynamoTableName
+        ENVIRONMENT_SAM: !Ref Environment
+        REGION_AWS: !Ref AWS::Region
 
 Resources:
   LayerShared:

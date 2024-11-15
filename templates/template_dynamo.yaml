@@ -49,6 +49,8 @@ Resources:
           AttributeType: S
         - AttributeName: SK
           AttributeType: S
+        - AttributeName: email
+          AttributeType: S
       KeySchema:
         - AttributeName: PK
           KeyType: HASH
@@ -61,6 +63,15 @@ Resources:
               KeyType: HASH
             - AttributeName: PK
               KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: !Ref DynamoDBReadCapacityUnits
+            WriteCapacityUnits: !Ref DynamoDBWriteCapacityUnits
+        - IndexName: GSI_Email
+          KeySchema:
+            - AttributeName: email
+              KeyType: HASH
           Projection:
             ProjectionType: ALL
           ProvisionedThroughput:

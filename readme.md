@@ -40,6 +40,6 @@
 
 # Deploy
 
-sam deploy --guided --profile test
+sam deploy --guided --profile pheno
 sam build --use-container
-sam deploy --profile test --config-env develop
+sam deploy --profile pheno --config-env develop

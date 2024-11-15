@@ -11,7 +11,7 @@ def get_dynamodb_table(table_name: str):
             endpoint_url=constants.ENDPOINT_URL_DYNAMO,
         )
     else:
-        dynamodb = boto3.resource("dynamodb", region_name="us-west-2")
+        dynamodb = boto3.resource("dynamodb", region_name=constants.REGION_AWS)
     return dynamodb.Table(table_name)
 
 

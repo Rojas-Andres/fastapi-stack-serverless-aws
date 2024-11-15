@@ -200,20 +200,6 @@ Resources:
             Method: POST
             Auth:
               Authorizer: NONE
-        Social:
-          Type: Api
-          Properties:
-            RestApiId: !Ref Api
-            Path: /auth/social
-            Method: POST
-            Auth:
-              Authorizer: NONE
-        SocialRegister:
-          Type: Api
-          Properties:
-            RestApiId: !Ref Api
-            Path: /auth/social/register
-            Method: POST
 
   CompanyFunction:
     Type: AWS::Serverless::Function
@@ -269,30 +255,6 @@ Resources:
             Method: GET
             Auth:
               Authorizer: NONE
-  # NotificationFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     CodeUri: modules/notifications
-  #     FunctionName: !Sub notifications-${StackName}-${Environment}
-  #     Description: !Sub notifications «${Environment}»
-  #     Timeout: !Ref AuthorizerTimeout
-  #     Policies:
-  #       - SQSPollerPolicy:
-  #           QueueName: !GetAtt SqsQueue.QueueName
-  #       - VPCAccessPolicy : {}
-  #     Events:
-  #       SQSEvent:
-  #         Type: SQS
-  #         Properties:
-  #           Queue: !GetAtt SqsQueue.Arn
-  #           BatchSize: !Ref SQSBatchSize
-
-  # SqsQueue:
-  #   Type: AWS::SQS::Queue
-  #   Properties:
-  #     QueueName: !Sub sqs-queue-${StackName}-${Environment}
-  #     VisibilityTimeout: !Ref AuthorizerTimeout
-
 
 Outputs:
   Region:

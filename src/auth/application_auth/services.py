@@ -2,13 +2,14 @@ import json
 import uuid
 from typing import Any, Dict, List, Optional
 
-from domain_auth.entities import Auth, User, UserCommon
+from domain_auth.entities import User, UserCommon
+from shared.domain.entities import Auth
 from domain_auth.exceptions import (
     UserAlreadyExistsException,
     ValidationError,
     UserPasswordInvalid,
 )
-from infrastructure_auth.dynamodb_auth_repository import DynamoDBAuthRepository
+
 from infrastructure_auth.dynamodb_user_repository import DynamoDBUserRepository
 
 from shared.encription import Hasher, generate_token
@@ -57,22 +58,3 @@ class UserService:
         if not password_hash:
             raise ValidationError(message="Password is invalid")
         return user_exists
-
-
-class AuthService:
-    def __init__(self):
-        self.repository_auth = DynamoDBAuthRepository(table_auth)
-
-    def create_auth_login(
-        self,
-        email: str,
-    ) -> User:
-        uuid_auth = str(uuid.uuid4())
-        token = generate_token(uuid_auth)
-        token_auth = Auth(
-            uuid=uuid_auth,
-            jwt=token,
-            email=email,
-        )
-        self.repository_auth.save(token_auth)
-        return token

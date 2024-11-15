@@ -7,6 +7,11 @@ import traceback
 
 import jwt
 from lib_authorizer.utils import generate_policy, validate_token
+from shared.constants import constants
+from shared.application.services import AuthService
+
+
+auth_service = AuthService()
 
 
 def handler(event, context):
@@ -31,9 +36,9 @@ def handler(event, context):
 
         token = event.get("authorizationToken")
         token_decode = jwt.decode(
-            jwt=token, key=os.getenv("SECRET_KEY"), algorithms=["HS256"]
+            jwt=token, key=constants.SECRET_KEY, algorithms=["HS256"]
         )
-        user_id = validate_token(str(token_decode["user_id"]))
+        user_id = validate_token(str(token_decode["uuid"]))
         user_id = int(user_id["uuid"]) if user_id else None
         if user_id:
             return generate_policy(user_id, "Allow", token_decode)

@@ -12,8 +12,3 @@ class UserRepository(ABC):
 
     @abstractmethod
     def find_by_email(self, email: str) -> User: ...
-
-
-class AuthRepository(ABC):
-    @abstractmethod
-    def save(self, user: User) -> User: ...

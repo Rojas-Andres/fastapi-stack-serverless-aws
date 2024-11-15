@@ -4,7 +4,7 @@ Módulo que contiene la aplicación FastAPI que maneja las rutas de autenticaci�
 
 import os
 
-from application_auth.services import AuthService, UserService
+from application_auth.services import UserService
 from domain_auth.exceptions import UserAlreadyExistsException, ValidationError
 from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi import status as response_status
@@ -14,6 +14,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from presentation_auth.schemas import UserCreate, UserSignin
 from starlette.requests import Request
+from shared.application.services import AuthService
+
 
 app = FastAPI(
     debug=os.getenv("DEBUG", False),

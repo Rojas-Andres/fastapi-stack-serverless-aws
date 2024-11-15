@@ -10,7 +10,7 @@ import requests
 from lib_authorizer.db import AuthorizerDB as DB
 
 
-def validate_token(token, methodArn=None):
+def validate_token(uuid: str, methodArn=None):
     """
     Valida un token de autorización utilizando una instancia de la clase DB.
 
@@ -23,7 +23,7 @@ def validate_token(token, methodArn=None):
     """
     try:
         db = DB()
-        return db.get_item_by_uuid(token)
+        return db.get_item_by_uuid(uuid)
     except Exception as e:
         print("Error in validate_token: ", e)
         return None

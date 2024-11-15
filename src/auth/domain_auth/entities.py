@@ -12,9 +12,3 @@ class UserCommon(BaseModel):
 
 class User(UserCommon):
     password: str
-
-
-class Auth(BaseModel):
-    email: str
-    jwt: str
-    uuid: str

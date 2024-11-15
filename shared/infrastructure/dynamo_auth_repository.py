@@ -1,7 +1,7 @@
 from boto3.dynamodb.conditions import Key
 from shared.domain.entities import Auth
 
-from domain.repositories import AuthRepository
+from shared.domain.repositories import AuthRepository
 
 from shared.infrastructure.dynamodb_repository import DynamoDBRepository
 

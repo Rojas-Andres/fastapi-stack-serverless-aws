@@ -198,8 +198,6 @@ Resources:
             RestApiId: !Ref Api
             Path: /auth/signup
             Method: POST
-            Auth:
-              Authorizer: NONE
 
   CompanyFunction:
     Type: AWS::Serverless::Function

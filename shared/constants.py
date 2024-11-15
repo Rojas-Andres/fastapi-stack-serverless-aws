@@ -14,7 +14,7 @@ class Constants:
     ENV_AWS_SECRET_KEY = os.environ.get("ENV_AWS_SECRET_KEY", "FAKE_SECRET")
     SECRET_KEY = os.environ.get("SECRET_KEY")
     TOKEN_API_EXPIRATION = int(os.environ.get("TOKEN_API_EXPIRATION", 3600))
-    ENVIRONMENT = os.environ.get("ENVIRONMENT", "local")
+    ENVIRONMENT_LOCAL_FASTAPI = os.environ.get("ENVIRONMENT_LOCAL_FASTAPI", "local")
 
 
 constants = Constants()

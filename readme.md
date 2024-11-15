@@ -23,3 +23,23 @@
 - El .env es el que toma las variables de entorno en para python como tal (el cual se encuentra aca shared/constants.py ) y en parameters.json son parametros de los template de cloudformation
 
 - 
+
+
+
+## Deploy local
+
+
+- list profiles local
+    - cat ~/.aws/credentials
+
+  The first time it is deployed it should be run with **sam deploy --guided --profile MY_PROFILE**
+  ```bash
+  $ sam build --use-container && sam deploy --config-env develop|staging|production && rm -rf .aws-sam
+  $ sam deploy --profile YOUR_PROFILE --config-env develop
+
+
+# Deploy
+
+sam deploy --guided --profile test
+sam build --use-container
+sam deploy --profile test --config-env develop

@@ -11,11 +11,11 @@ Parameters:
     Description: Environment in which the resources will be deploy
     Type: String
     Default: local
-  DyanmoDBReadCapacityUnits:
+  DynamoDBReadCapacityUnits:
     Description: dynamodb read capacity units
     Type: String
     Default: 5
-  DyanmoDBWriteCapacityUnits:
+  DynamoDBWriteCapacityUnits:
     Description: dynamodb write capacity units
     Type: String
     Default: 5
@@ -36,8 +36,8 @@ Resources:
         AttributeName: expires_at
         Enabled: true
       ProvisionedThroughput:
-        ReadCapacityUnits: !Ref DyanmoDBReadCapacityUnits
-        WriteCapacityUnits: !Ref DyanmoDBWriteCapacityUnits
+        ReadCapacityUnits: !Ref DynamoDBReadCapacityUnits
+        WriteCapacityUnits: !Ref DynamoDBWriteCapacityUnits
 
 
   DynamoDBTable:
@@ -67,8 +67,8 @@ Resources:
             ReadCapacityUnits: !Ref DynamoDBReadCapacityUnits
             WriteCapacityUnits: !Ref DynamoDBWriteCapacityUnits
       ProvisionedThroughput:
-        ReadCapacityUnits: !Ref DyanmoDBReadCapacityUnits
-        WriteCapacityUnits: !Ref DyanmoDBWriteCapacityUnits
+        ReadCapacityUnits: !Ref DynamoDBReadCapacityUnits
+        WriteCapacityUnits: !Ref DynamoDBWriteCapacityUnits
 
   DynamoDBTableLogs:
     Type: AWS::DynamoDB::Table
@@ -85,8 +85,8 @@ Resources:
         - AttributeName: timestamp
           KeyType: RANGE
       ProvisionedThroughput:
-        ReadCapacityUnits: !Ref DyanmoDBReadCapacityUnits
-        WriteCapacityUnits: !Ref DyanmoDBWriteCapacityUnits
+        ReadCapacityUnits: !Ref DynamoDBReadCapacityUnits
+        WriteCapacityUnits: !Ref DynamoDBWriteCapacityUnits
 
 Outputs:
   DynamoTableName:

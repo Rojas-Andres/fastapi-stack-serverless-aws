@@ -25,14 +25,14 @@ Parameters:
     Description: global timeout
     Type: String
     Default: GlobalTimeout
-  DyanmoDBReadCapacityUnits:
+  DynamoDBReadCapacityUnits:
     Description: dynamodb read capacity units
     Type: String
-    Default: DyanmoDBReadCapacityUnits
-  DyanmoDBWriteCapacityUnits:
+    Default: DynamoDBReadCapacityUnits
+  DynamoDBWriteCapacityUnits:
     Description: dynamodb write capacity units
     Type: String
-    Default: DyanmoDBWriteCapacityUnits
+    Default: DynamoDBWriteCapacityUnits
   SecretKey:
     Description: Secret Key
     Type: String
@@ -55,8 +55,8 @@ Resources:
       Parameters:
         StackName: !Ref StackName
         Environment: !Ref Environment
-        DyanmoDBReadCapacityUnits: !Ref DyanmoDBReadCapacityUnits
-        DyanmoDBWriteCapacityUnits: !Ref DyanmoDBWriteCapacityUnits
+        DynamoDBReadCapacityUnits: !Ref DynamoDBReadCapacityUnits
+        DynamoDBWriteCapacityUnits: !Ref DynamoDBWriteCapacityUnits
       Tags:
         Environment: !Ref Environment
         StackName: !Ref StackName
@@ -92,7 +92,6 @@ Resources:
         AuthorizerTimeout: !Ref AuthorizerTimeout
         SQSBatchSize: !Ref SQSBatchSize
         SendGridApiKey: !Ref SendGridApiKey
-        FromEmail: !Ref FromEmail
         StackName: !Ref StackName
         # Dynamo
         DynamoTableName: !GetAtt DynamoStack.Outputs.DynamoTableName

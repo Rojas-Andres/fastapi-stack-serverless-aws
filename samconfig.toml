@@ -1,0 +1,10 @@
+version = 0.1
+[develop.deploy.parameters]
+stack_name = "stack-fastapi"
+resolve_s3 = true
+s3_prefix = "stack-fastapi"
+region = "us-east-2"
+profile = "pheno"
+capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND"
+parameter_overrides = "Environment=\"dev\" SQSBatchSize=\"5\" AuthorizerTimeout=\"60\" TokenExpiration=\"60\" GlobalTimeout=\"60\" DynamoDBReadCapacityUnits=\"5\" DynamoDBWriteCapacityUnits=\"5\" SecretKey=\"secret_key\" StackName=\"stack-fastapi\" SendGridApiKey=\"sendgrid\""
+image_repositories = []

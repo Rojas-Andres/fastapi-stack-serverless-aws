@@ -58,7 +58,7 @@ def api_get_company(request: Request, company_id: str):
     try:
         return company_service.get_company(company_id)
     except CompanyNotFoundException:
-        raise HTTPException(status_code=404, detail="Company not found")
+        raise HTTPException(status_code=400, detail="Company not found")
 
 
 @router.patch("/{company_id}")

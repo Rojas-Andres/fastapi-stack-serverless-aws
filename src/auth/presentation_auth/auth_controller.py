@@ -55,10 +55,10 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 
 @router.post(
-    "/signin",
+    "/login",
     status_code=response_status.HTTP_200_OK,
 )
-async def api_signin(
+async def api_login(
     request: Request,
     user_login: UserSignin,
 ):
@@ -85,7 +85,7 @@ async def api_signin(
 
 
 @router.post(
-    "/signup",
+    "/logout",
     status_code=response_status.HTTP_200_OK,
 )
 async def api_signup(request: Request, user_data=Depends(get_user_authorizer)):
@@ -107,6 +107,29 @@ async def api_signup(request: Request, user_data=Depends(get_user_authorizer)):
     except (UserAlreadyExistsException, ValidationError) as e:
         print(e)
         raise HTTPException(status_code=400, detail=e.message)
+
+
+@router.post(
+    "/register",
+    status_code=response_status.HTTP_201_CREATED,
+)
+async def api_register(request: Request, user: UserCreate):
+    """
+    Registra un nuevo usuario en el sistema.
+
+    :param request: La solicitud HTTP recibida.
+    :type request: Request
+    :param user: Los datos del usuario a ser registrados.
+    :param db: Una sesión de base de datos.
+    :type db: Session
+    :return: Una respuesta que indica el éxito del registro.
+    :rtype: dict
+    """
+    try:
+        return user_service.create_user(**user.dict())
+    except UserAlreadyExistsException as e:
+        print(e)
+        raise HTTPException(status_code=400, detail="User Already Exists")
 
 
 @router.get(

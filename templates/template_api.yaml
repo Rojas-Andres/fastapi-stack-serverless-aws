@@ -185,19 +185,27 @@ Resources:
             Method: GET
             Auth:
               Authorizer: NONE
-        Singin:
+        Login:
           Type: Api
           Properties:
             RestApiId: !Ref Api
-            Path: /auth/signin
+            Path: /auth/login
             Method: POST
             Auth:
               Authorizer: NONE
-        Singup:
+        Register:
           Type: Api
           Properties:
             RestApiId: !Ref Api
-            Path: /auth/signup
+            Path: /auth/register
+            Method: POST
+            Auth:
+              Authorizer: NONE
+        Logout:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /auth/logout
             Method: POST
 
   CompanyFunction:

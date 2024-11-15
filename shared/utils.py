@@ -28,6 +28,7 @@ def get_user_authorizer(
         token: str = request.headers.get("Authorization", "")
         from shared.application.services import AuthService
         from shared.utils import generate_policy_authorizer
+
         auth_service = AuthService()
         policy = generate_policy_authorizer({"authorizationToken": token}, auth_service)
         if policy["policyDocument"]["Statement"][0]["Effect"] == "Deny":

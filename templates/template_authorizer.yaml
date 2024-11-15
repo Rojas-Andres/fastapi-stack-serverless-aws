@@ -47,7 +47,7 @@ Resources:
       Environment:
         Variables:
           FUNCTION_NAME: !Sub auth-${StackName}-${Environment}
-          AUTHORIZER_TABLE: !Ref DynamoTableName
+          DYNAMO_DB_TABLE_AUTH: !Ref DynamoTableName
       Policies:
         - AmazonDynamoDBFullAccess
 

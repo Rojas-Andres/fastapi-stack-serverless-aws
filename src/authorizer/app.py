@@ -6,7 +6,7 @@ import os
 import traceback
 
 import jwt
-from lib_authorizer.utils import generate_policy, validate_token
+from lib_authorizer.utils import generate_policy
 from shared.constants import constants
 from shared.application.services import AuthService
 
@@ -33,13 +33,11 @@ def handler(event, context):
     try:
         if not event or not event.get("authorizationToken"):
             return generate_policy("user", "Deny")
-
         token = event.get("authorizationToken")
         token_decode = jwt.decode(
             jwt=token, key=constants.SECRET_KEY, algorithms=["HS256"]
         )
-        user_id = validate_token(str(token_decode["uuid"]))
-        user_id = int(user_id["uuid"]) if user_id else None
+        user_id = auth_service.get_user_by_uuid(token_decode["uuid"])
         if user_id:
             return generate_policy(user_id, "Allow", token_decode)
         return generate_policy("user", "Deny")
@@ -48,5 +46,4 @@ def handler(event, context):
         return generate_policy("user", "Deny")
     except Exception as e:
         print(traceback.format_exc())
-        # send_slack_message(traceback.format_exc(), "error")
         return generate_policy("user", "Deny", str(e))

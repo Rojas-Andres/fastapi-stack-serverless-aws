@@ -2,32 +2,6 @@
 Este módulo contiene funciones de utilidad para el módulo authorizer.
 """
 
-import json
-import os
-from datetime import datetime
-
-import requests
-from lib_authorizer.db import AuthorizerDB as DB
-
-
-def validate_token(uuid: str, methodArn=None):
-    """
-    Valida un token de autorización utilizando una instancia de la clase DB.
-
-    :param token: El token de autorización a validar.
-    :type token: str
-    :param methodArn: El recurso de Amazon API Gateway.
-    :type methodArn: str or None
-    :return: El ID de usuario asociado al token si es válido, de lo contrario, None.
-    :rtype: str or None
-    """
-    try:
-        db = DB()
-        return db.get_item_by_uuid(uuid)
-    except Exception as e:
-        print("Error in validate_token: ", e)
-        return None
-
 
 def generate_policy(principal_id, effect, data=None):
     """

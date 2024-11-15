@@ -6,7 +6,7 @@ import os
 
 from application_auth.services import UserService
 from domain_auth.exceptions import UserAlreadyExistsException, ValidationError
-from fastapi import APIRouter, FastAPI, HTTPException
+from fastapi import APIRouter, FastAPI, HTTPException, Depends
 from fastapi import status as response_status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
@@ -15,7 +15,7 @@ from fastapi.responses import JSONResponse
 from presentation_auth.schemas import UserCreate, UserSignin
 from starlette.requests import Request
 from shared.application.services import AuthService
-
+from shared.utils import get_user_authorizer
 
 app = FastAPI(
     debug=os.getenv("DEBUG", False),
@@ -55,29 +55,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 
 @router.post(
-    "/signup",
-    status_code=response_status.HTTP_201_CREATED,
-)
-async def api_singup(request: Request, user: UserCreate):
-    """
-    Registra un nuevo usuario en el sistema.
-
-    :param request: La solicitud HTTP recibida.
-    :type request: Request
-    :param user: Los datos del usuario a ser registrados.
-    :param db: Una sesión de base de datos.
-    :type db: Session
-    :return: Una respuesta que indica el éxito del registro.
-    :rtype: dict
-    """
-    try:
-        return user_service.create_user(**user.dict())
-    except UserAlreadyExistsException as e:
-        print(e)
-        raise HTTPException(status_code=404, detail="User Already Exists")
-
-
-@router.post(
     "/signin",
     status_code=response_status.HTTP_200_OK,
 )
@@ -102,6 +79,31 @@ async def api_signin(
         return {
             "token": token,
         }
+    except (UserAlreadyExistsException, ValidationError) as e:
+        print(e)
+        raise HTTPException(status_code=400, detail=e.message)
+
+
+@router.post(
+    "/signup",
+    status_code=response_status.HTTP_200_OK,
+)
+async def api_signup(request: Request, user_data=Depends(get_user_authorizer)):
+    """
+    Permite que un usuario inicie sesión en el sistema.
+
+    :param request: La solicitud HTTP recibida.
+    :type request: Request
+    :param credentials: Las credenciales de inicio de sesión proporcionadas por el usuario.
+    :param db: Una sesión de base de datos.
+    :type db: Session
+    :return: Una respuesta que indica el éxito del inicio de sesión.
+    :rtype: dict
+    """
+    try:
+        uuid = user_data["uuid"]
+        auth_service.delete_auth(uuid)
+        return {"response": "User logout successfully"}
     except (UserAlreadyExistsException, ValidationError) as e:
         print(e)
         raise HTTPException(status_code=400, detail=e.message)

@@ -6,10 +6,16 @@ from domain.repositories import AuthRepository
 from shared.infrastructure.dynamodb_repository import DynamoDBRepository
 
 
-class DynamoDBAuthRepository(DynamoDBRepository, AuthRepository):
-    def get_item(self, uuid: str, sk: str = None) -> dict:
+class DynamoDBAuthRepository(AuthRepository):
+    def __init__(self, table):
+        self.table = table
+
+    def get_item(self, uuid: str) -> dict:
         response = self.table.get_item(Key={"uuid": uuid})
         return response.get("Item")
+
+    def put_item(self, item: dict):
+        self.table.put_item(Item=item)
 
     def save(self, auth: Auth) -> Auth:
         item = {
@@ -29,3 +35,6 @@ class DynamoDBAuthRepository(DynamoDBRepository, AuthRepository):
                 jwt=item["jwt"],
             )
         return None
+
+    def delete(self, uuid: str):
+        self.table.delete_item(Key={"uuid": uuid})

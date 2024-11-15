@@ -26,3 +26,6 @@ class AuthService:
 
     def get_user_by_uuid(self, uuid: str) -> Auth:
         return self.repository_auth.get_user_by_uuid(uuid)
+
+    def delete_auth(self, uuid: str):
+        self.repository_auth.delete(uuid)

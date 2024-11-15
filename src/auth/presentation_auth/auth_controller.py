@@ -88,7 +88,7 @@ async def api_login(
     "/logout",
     status_code=response_status.HTTP_200_OK,
 )
-async def api_signup(request: Request, user_data=Depends(get_user_authorizer)):
+async def api_logout(request: Request, user_data=Depends(get_user_authorizer)):
     """
     Permite que un usuario inicie sesión en el sistema.
 
